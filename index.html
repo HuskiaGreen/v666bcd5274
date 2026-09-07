@@ -1138,9 +1138,10 @@
   });
 
   /* Gribouillis animés du hero (desktop).
-     1) à l'arrivée : les gribouillis coraux (étoiles, cœur, flèche, gouttes, trait) se
-        TRACENT sous nos yeux (calque « fantôme » en contour + stroke-dashoffset) ;
-        les mots s'écrivent de gauche à droite ; les nuages pâles (~10 %) sont déjà là, fixes.
+     1) à l'arrivée : SEULS les gribouillis coraux (étoiles, cœur, flèche, gouttes, trait) se
+        TRACENT sous nos yeux (calque « fantôme » en contour + stroke-dashoffset).
+        Les mots en typo bâton (print, IA, web…) et les nuages pâles sont déjà là, fixes
+        (retour Lisa 11e session : « que les gribouillis qui apparaissent »).
      2) ensuite : respiration continue, chaque gribouillis à son propre rythme. */
   (function(){
     var svg = document.querySelector('.hero-svg');
@@ -1216,24 +1217,13 @@
         setTimeout(function(){ ghost.remove(); }, 380);
       }, delay + dur);
     }
-    // un mot s'écrit de gauche à droite
-    function wipe(groupEl, delay, dur){
-      groupEl.animate(
-        [{ clipPath: 'inset(-25% 101% -25% -25%)' }, { clipPath: 'inset(-25% -25% -25% -25%)' }],
-        { duration: dur, delay: delay, easing: 'ease', fill: 'backwards' }
-      );
-    }
-
     var t = 120, GAP = 115;
     els.forEach(function(el){
-      if(el._word){
-        wipe(el, t, 600); t += GAP;
-      } else {
-        var paths = el.tagName.toLowerCase() === 'path'
-          ? [el] : Array.prototype.slice.call(el.querySelectorAll('path'));
-        paths.forEach(function(p, k){ draw(p, t + k * 80, 580); });
-        t += GAP + (paths.length - 1) * 80;
-      }
+      if(el._word) return;                       // mots en typo bâton : déjà là, on n'anime pas l'entrée
+      var paths = el.tagName.toLowerCase() === 'path'
+        ? [el] : Array.prototype.slice.call(el.querySelectorAll('path'));
+      paths.forEach(function(p, k){ draw(p, t + k * 80, 580); });
+      t += GAP + (paths.length - 1) * 80;
     });
 
     setTimeout(function(){ svg.classList.add('doodles-float'); }, t + 1300);
