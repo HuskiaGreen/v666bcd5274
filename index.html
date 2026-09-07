@@ -1187,7 +1187,6 @@
       var r1 = seed(i + 1), r2 = seed(i + 8.3), r3 = seed(i + 27.7);
       el.classList.add('hero-doodle');
       el.style.setProperty('--dur', (gentle ? 6.2 + r1 * 3 : 4 + r1 * 2.4).toFixed(2) + 's');
-      el.style.setProperty('--da',  (r2 * 2.4).toFixed(2) + 's');
       el.style.setProperty('--dy',  ((gentle ? 8 : 11) + r3 * 9).toFixed(1) + 'px');
       el.style.setProperty('--dx',  ((r1 - 0.5) * (gentle ? 9 : 16)).toFixed(1) + 'px');
       el.style.setProperty('--rot', ((r2 - 0.5) * (gentle ? 2.4 : 7)).toFixed(2) + 'deg');
