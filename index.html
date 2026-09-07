@@ -177,6 +177,27 @@
   .hero-eye.is-r{left:41.05%; top:26.93%; width:8.54%;  aspect-ratio:52/45; background-image:var(--eye-r);}
   @media (prefers-reduced-motion: reduce){ .hero-eye{transition:none;} }
 
+  /* Gribouillis animés du hero (desktop) : chaque gribouillis (étoile, cœur, flèche,
+     feu d'artifice, mots flottants…) se dessine à l'arrivée puis « respire » en continu,
+     chacun à son propre rythme. Les variables --* sont posées par le JS, gribouillis par gribouillis. */
+  .hero-doodle{ transform-box: fill-box; transform-origin: 50% 50%; }
+  .hero-svg.doodles-live .hero-doodle{
+    will-change: transform;
+    animation:
+      heroDoodleIn .6s cubic-bezier(.22,1,.36,1) var(--dl,0s) both,
+      heroDoodleFloat var(--dur,6s) ease-in-out calc(var(--dl,0s) + .6s + var(--da,0s)) infinite;
+  }
+  @keyframes heroDoodleIn{
+    from{ opacity:0; transform:translateY(7px) scale(.93); }
+    to  { opacity:var(--op,1); transform:none; }
+  }
+  @keyframes heroDoodleFloat{
+    0%,100%{ transform:translate(0,0) rotate(0); }
+    50%    { transform:translate(var(--dx,0), var(--dy,0)) rotate(var(--rot,0deg)); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-svg.doodles-live .hero-doodle{ animation:none !important; opacity:var(--op,1); transform:none; }
+  }
 
   /* ---------- Section headings ---------- */
   .section-head{text-align:center; margin-bottom:44px;}
@@ -1115,6 +1136,59 @@
       }
     });
   });
+
+  /* Gribouillis animés du hero (desktop) — entrée « qui se dessine » + respiration continue.
+     Chaque gribouillis garde son opacité d'origine ; les nuages de fond très pâles sont laissés
+     immobiles (ils débordent sur la carte « Qui suis-je »). */
+  (function(){
+    var svg = document.querySelector('.hero-svg');
+    if(!svg) return;
+
+    var els = [];
+    ['#heroLeadDeco', '#heroAside'].forEach(function(sel){
+      var root = svg.querySelector(sel);
+      if(!root) return;
+      Array.prototype.forEach.call(root.children, function(node){
+        var tag = node.tagName.toLowerCase();
+        if(tag !== 'g' && tag !== 'path') return;
+        var firstPath = tag === 'path' ? node : node.querySelector('path');
+        if(!firstPath) return;                                  // groupe sans tracé -> on ignore
+        var o = parseFloat((tag === 'path' ? node : firstPath).getAttribute('opacity') || '1');
+        if(o <= 0.15) return;                                   // nuage de fond très pâle -> immobile
+        els.push(node);
+      });
+    });
+    if(!els.length) return;
+
+    // ordre d'apparition : depuis le coin de « Hello ! » vers l'extérieur
+    var ax = 200, ay = 470;
+    els.forEach(function(el){
+      var b; try{ b = el.getBBox(); }catch(e){ b = {x:0, y:0, width:0, height:0}; }
+      el._b = b;
+      el._d = Math.sqrt(Math.pow(b.x + b.width/2 - ax, 2) + Math.pow(b.y + b.height/2 - ay, 2));
+    });
+    els.sort(function(p, q){ return p._d - q._d; });
+
+    function seed(i){ var x = Math.sin(i * 999.13) * 10000; return x - Math.floor(x); } // 0..1, stable
+
+    els.forEach(function(el, i){
+      var b = el._b;
+      var word   = el.tagName.toLowerCase() === 'g' && !!el.querySelector('[fill="#706f6f"]');
+      var gentle = word || b.width > 520 || b.height > 360;      // mots / grands tracés -> mouvement plus sage
+      var r1 = seed(i + 1), r2 = seed(i + 8.3), r3 = seed(i + 27.7);
+
+      el.classList.add('hero-doodle');
+      el.style.setProperty('--op',  getComputedStyle(el).opacity || '1');
+      el.style.setProperty('--dl',  (0.15 + i * 0.055).toFixed(2) + 's');
+      el.style.setProperty('--dur', (gentle ? 6.4 + r1 * 3.2 : 4.6 + r1 * 2.6).toFixed(2) + 's');
+      el.style.setProperty('--da',  '-' + (r2 * 6).toFixed(2) + 's');
+      el.style.setProperty('--dy',  ((gentle ? 4 : 3.5) + r3 * 4).toFixed(1) + 'px');
+      el.style.setProperty('--dx',  ((r1 - 0.5) * (gentle ? 3 : 6)).toFixed(1) + 'px');
+      el.style.setProperty('--rot', ((r2 - 0.5) * (gentle ? 1.0 : 4.2)).toFixed(2) + 'deg');
+    });
+
+    svg.classList.add('doodles-live');
+  })();
 
   /* Yeux qui suivent la souris (hero desktop) */
   (function(){
