@@ -1217,16 +1217,18 @@
         setTimeout(function(){ ghost.remove(); }, 380);
       }, delay + dur);
     }
-    var t = 120, GAP = 115;
+    // vitesse du tracé (retour Lisa 11e session : « un peu plus lentement »)
+    var DRAW = 950, GAP = 190, STEP = 135;      // durée d'un tracé / pause entre gribouillis / décalage par tracé supplémentaire
+    var t = 120;
     els.forEach(function(el){
       if(el._word) return;                       // mots en typo bâton : déjà là, on n'anime pas l'entrée
       var paths = el.tagName.toLowerCase() === 'path'
         ? [el] : Array.prototype.slice.call(el.querySelectorAll('path'));
-      paths.forEach(function(p, k){ draw(p, t + k * 80, 580); });
-      t += GAP + (paths.length - 1) * 80;
+      paths.forEach(function(p, k){ draw(p, t + k * STEP, DRAW); });
+      t += GAP + (paths.length - 1) * STEP;
     });
 
-    setTimeout(function(){ svg.classList.add('doodles-float'); }, t + 1300);
+    setTimeout(function(){ svg.classList.add('doodles-float'); }, t + 1500);
   })();
 
   /* Yeux qui suivent la souris (hero desktop) */
