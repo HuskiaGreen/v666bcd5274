@@ -1147,8 +1147,8 @@
       gx += (tx - gx) * 0.16;
       gy += (ty - gy) * 0.16;
       var r = wrap.getBoundingClientRect();
-      var ax = r.width * 0.009;               /* amplitude horizontale ~0.9% de l'avatar */
-      var ay = r.width * 0.0052;
+      var ax = r.width * 0.0046;              /* amplitude horizontale ~0.46% de l'avatar (mouvement discret) */
+      var ay = r.width * 0.0027;
       var t = 'translate(' + (gx*ax).toFixed(2) + 'px,' + (gy*ay).toFixed(2) + 'px)';
       eyeL.style.transform = t;
       eyeR.style.transform = t;
