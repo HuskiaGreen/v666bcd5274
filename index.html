@@ -184,9 +184,12 @@
      2) ensuite, chaque gribouillis « respire » en continu, à son propre rythme. */
   .hero-doodle{ transform-box: fill-box; transform-origin: 50% 50%; }
   .hero-doodle-ghost{ pointer-events: none; }
-  .hero-svg.doodles-float .hero-doodle{
+  /* la respiration démarre gribouillis par gribouillis, dès que son tracé est fini
+     (classe .is-floating posée par le JS) ; .doodles-float = tout d'un coup (repli). */
+  .hero-svg.doodles-float .hero-doodle,
+  .hero-doodle.is-floating{
     will-change: transform;
-    animation: heroDoodleFloat var(--dur, 6s) ease-in-out var(--da, 0s) infinite;
+    animation: heroDoodleFloat var(--dur, 6s) ease-in-out 0s infinite;
   }
   @keyframes heroDoodleFloat{
     0%   { transform: translate(0,0) rotate(0); }
@@ -196,7 +199,8 @@
     100% { transform: translate(0,0) rotate(0); }
   }
   @media (prefers-reduced-motion: reduce){
-    .hero-svg.doodles-float .hero-doodle{ animation: none !important; }
+    .hero-svg.doodles-float .hero-doodle,
+    .hero-doodle.is-floating{ animation: none !important; }
   }
 
   /* ---------- Section headings ---------- */
@@ -1219,16 +1223,27 @@
     }
     // vitesse du tracé (retour Lisa 11e session : « un peu plus lentement »)
     var DRAW = 950, GAP = 190, STEP = 135;      // durée d'un tracé / pause entre gribouillis / décalage par tracé supplémentaire
-    var t = 120;
+    var t = 120, last = 0;
+    // les mots (déjà à l'écran) respirent tout de suite, légèrement décalés
+    var wi = 0;
+    els.forEach(function(el){
+      if(!el._word) return;
+      setTimeout(function(){ el.classList.add('is-floating'); }, 200 + wi * 120); wi++;
+    });
     els.forEach(function(el){
       if(el._word) return;                       // mots en typo bâton : déjà là, on n'anime pas l'entrée
       var paths = el.tagName.toLowerCase() === 'path'
         ? [el] : Array.prototype.slice.call(el.querySelectorAll('path'));
       paths.forEach(function(p, k){ draw(p, t + k * STEP, DRAW); });
+      // dès que SON tracé est fini (fantôme fondu inclus), CE gribouillis se met à respirer
+      var doneAt = t + (paths.length - 1) * STEP + DRAW + 340;
+      last = Math.max(last, doneAt);
+      setTimeout(function(){ el.classList.add('is-floating'); }, doneAt);
       t += GAP + (paths.length - 1) * STEP;
     });
 
-    setTimeout(function(){ svg.classList.add('doodles-float'); }, t + 1500);
+    // filet de sécurité : si un setTimeout saute, tout respire au plus tard ici
+    setTimeout(function(){ svg.classList.add('doodles-float'); }, last + 400);
   })();
 
   /* Yeux qui suivent la souris (hero desktop) */
