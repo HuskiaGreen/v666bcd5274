@@ -1249,36 +1249,40 @@
     // filet de sécurité : si un setTimeout saute, tout respire au plus tard ici
     setTimeout(function(){ svg.classList.add('doodles-float'); }, last + 400);
 
-    /* --- brique C : parallaxe souris (effet de profondeur, se marie aux yeux) ---
-       chaque gribouillis se décale un peu selon la position de la souris ; les petits
-       coraux « devant » bougent plus, les mots / grands tracés « au fond » bougent moins. */
+    /* --- brique C : réaction de proximité (retour Lisa) ---
+       quand la souris s'approche d'UN gribouillis, LUI seul se décale (il « esquive »
+       le curseur) ; les autres ne bougent pas. Décalage = vars CSS --px/--py qui
+       s'ajoutent à la respiration. Chaque gribouillis revient tout seul à sa place. */
     var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
     if(fine.matches){
-      els.forEach(function(el){
-        var b = el._b;
-        var gentle = el._word || b.width > 520 || b.height > 360;
-        el._pAmp = gentle ? 4 : 10;                 // amplitude max, unités viewBox
-      });
-      var ptx = 0, pty = 0, pcx = 0, pcy = 0, praf = 0;
-      function ptick(){
-        pcx += (ptx - pcx) * 0.08;
-        pcy += (pty - pcy) * 0.08;
+      els.forEach(function(el){ el._ox = 0; el._oy = 0; });
+      var mx = -99999, my = -99999, praf = 0;
+      var PUSH = 26;                                  // décalage max, px écran
+      function pscale(){ var r = svg.getBoundingClientRect(); return (r.width / svg.viewBox.baseVal.width) || 0.8; }
+      function ploop(){
+        var s = pscale(), moving = false;
         els.forEach(function(el){
-          el.style.setProperty('--px', (pcx * el._pAmp).toFixed(2) + 'px');
-          el.style.setProperty('--py', (pcy * el._pAmp).toFixed(2) + 'px');
+          var r = el.getBoundingClientRect();
+          var cx = r.left + r.width  / 2 - el._ox * s;   // centre réel, sans notre propre décalage
+          var cy = r.top  + r.height / 2 - el._oy * s;
+          var dx = cx - mx, dy = cy - my;
+          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          var R = Math.max(r.width, r.height) / 2 + 110; // rayon d'influence autour du gribouillis
+          var f = dist < R ? Math.pow(1 - dist / R, 2) : 0;
+          var tx = (dx / dist) * f * PUSH / s;           // pousse à l'opposé du curseur, en unités viewBox
+          var ty = (dy / dist) * f * PUSH / s;
+          el._ox += (tx - el._ox) * 0.16;
+          el._oy += (ty - el._oy) * 0.16;
+          el.style.setProperty('--px', el._ox.toFixed(2) + 'px');
+          el.style.setProperty('--py', el._oy.toFixed(2) + 'px');
+          if(Math.abs(tx - el._ox) > 0.02 || Math.abs(ty - el._oy) > 0.02) moving = true;
         });
-        if(Math.abs(ptx - pcx) > 0.0006 || Math.abs(pty - pcy) > 0.0006){
-          praf = requestAnimationFrame(ptick);
-        }else{ praf = 0; }
+        praf = moving ? requestAnimationFrame(ploop) : 0;
       }
-      window.addEventListener('pointermove', function(e){
-        ptx = (e.clientX / window.innerWidth  - 0.5) * 2;   // -1 .. 1
-        pty = (e.clientY / window.innerHeight - 0.5) * 2;
-        if(!praf) praf = requestAnimationFrame(ptick);
-      }, { passive: true });
-      window.addEventListener('mouseleave', function(){
-        ptx = 0; pty = 0; if(!praf) praf = requestAnimationFrame(ptick);
-      });
+      function kick(){ if(!praf) praf = requestAnimationFrame(ploop); }
+      window.addEventListener('pointermove', function(e){ mx = e.clientX; my = e.clientY; kick(); }, { passive: true });
+      window.addEventListener('mouseleave', function(){ mx = -99999; my = -99999; kick(); });
+      window.addEventListener('scroll', kick, { passive: true });
     }
   })();
 
