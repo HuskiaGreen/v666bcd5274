@@ -303,6 +303,9 @@
   .section-squiggle path{fill:currentColor;}
   /* le trait de « Projets » était trop collé au mot (comme sur mobile) */
   #projets .section-squiggle{margin-top:11px;}
+  /* ...et un peu réduit sur desktop : son viewBox est plus court que les autres,
+     donc à largeur égale il était plus agrandi → trait plus épais / trop gros */
+  @media (min-width:701px){ #projets .section-squiggle{width:242px;} }
 
   /* bouton « Voir plus » : mobile uniquement (voir @media) */
   .see-more{display:none;}
