@@ -1260,7 +1260,7 @@
       els.forEach(function(el){
         var b = el._b;
         var gentle = el._word || b.width > 520 || b.height > 360;
-        el._ox = 0; el._oy = 0; el._push = gentle ? 26 : 12;
+        el._ox = 0; el._oy = 0; el._push = gentle ? 26 : 8;
       });
       var mx = -99999, my = -99999, praf = 0;
       function pscale(){ var r = svg.getBoundingClientRect(); return (r.width / svg.viewBox.baseVal.width) || 0.8; }
