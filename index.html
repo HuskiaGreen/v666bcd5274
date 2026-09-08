@@ -298,8 +298,11 @@
   .section-squiggle{
     display:block; width:min(82%,280px); height:auto; margin:2px auto 0;
     color:var(--coral); transform:translateX(-3%);
+    overflow:visible;   /* sinon le bout du trait est rogné au bord de la boîte SVG */
   }
   .section-squiggle path{fill:currentColor;}
+  /* le trait de « Projets » était trop collé au mot (comme sur mobile) */
+  #projets .section-squiggle{margin-top:11px;}
 
   /* bouton « Voir plus » : mobile uniquement (voir @media) */
   .see-more{display:none;}
@@ -732,7 +735,7 @@
 
     /* trait sous les titres de section : proportionné au titre (sinon trop large en mobile) */
     .section-squiggle{width:min(52%,160px);}
-    #projets .section-squiggle{margin-top:11px;}  /* un peu abaissé (était trop collé au titre) */
+    /* (#projets .section-squiggle margin-top : maintenant dans la règle de base) */
 
     /* Projets : grille 2×2, on affiche les 4 premières cartes, le reste
        derrière « Voir plus » (plus aéré qu'une seule colonne — retour Lisa) */
@@ -791,7 +794,10 @@
     }
 
     /* Contact : les 4 boutons alignés sur une seule ligne (évite le retour 3 + 1) */
-    #contact{padding-top:88px; padding-bottom:92px;}  /* marges haut/bas symétriques (88+44 illu = 92+40 footer ≈ 132px visibles) */
+    /* espace au-dessus de Contact réduit (retour Lisa : trop grand après le
+       carrousel d'illustrations) — on garde la symétrie haut/bas */
+    #illustrations{padding-bottom:26px;}
+    #contact{padding-top:60px; padding-bottom:64px;}
     #contact .section-head{margin-bottom:56px;}    /* + d'air entre le titre et les boutons */
     #contact .contact-row{gap:12px; flex-wrap:nowrap;}
     #contact .social-btn{width:60px; height:60px;}
