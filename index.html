@@ -1161,8 +1161,12 @@
         if(tag !== 'g' && tag !== 'path') return;
         var firstPath = tag === 'path' ? node : node.querySelector('path');
         if(!firstPath) return;                                  // groupe sans tracé -> on ignore
-        var o = parseFloat((tag === 'path' ? node : firstPath).getAttribute('opacity') || '1');
-        if(o <= 0.15) return;                                   // nuage pâle -> déjà là, immobile
+        // opacité effective : celle du groupe OU celle du tracé (le feu d'artifice est un
+        // <g opacity="0.1"> dont les <path> n'ont pas d'attribut -> il faut lire le groupe)
+        var oNode = parseFloat(node.getAttribute('opacity') || '1');
+        var oPath = parseFloat(firstPath.getAttribute('opacity') || '1');
+        var o = Math.min(oNode, oPath);
+        if(o <= 0.15) return;                                   // nuage pâle / feu d'artifice -> déjà là, immobile
         els.push(node);
       });
     });
