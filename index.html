@@ -191,12 +191,13 @@
     will-change: transform;
     animation: heroDoodleFloat var(--dur, 6s) ease-in-out 0s infinite;
   }
+  /* --px / --py = décalage parallaxe souris (posé par le JS, brique C), ajouté à la respiration */
   @keyframes heroDoodleFloat{
-    0%   { transform: translate(0,0) rotate(0); }
-    25%  { transform: translate(var(--dx,0), var(--dy,0)) rotate(var(--rot,0deg)); }
-    50%  { transform: translate(calc(var(--dx,0) * -.4), calc(var(--dy,0) * .2)) rotate(calc(var(--rot,0deg) * -.6)); }
-    75%  { transform: translate(calc(var(--dx,0) * .5), calc(var(--dy,0) * -.7)) rotate(calc(var(--rot,0deg) * .7)); }
-    100% { transform: translate(0,0) rotate(0); }
+    0%   { transform: translate(var(--px,0px),var(--py,0px)); }
+    25%  { transform: translate(var(--px,0px),var(--py,0px)) translate(var(--dx,0), var(--dy,0)) rotate(var(--rot,0deg)); }
+    50%  { transform: translate(var(--px,0px),var(--py,0px)) translate(calc(var(--dx,0) * -.4), calc(var(--dy,0) * .2)) rotate(calc(var(--rot,0deg) * -.6)); }
+    75%  { transform: translate(var(--px,0px),var(--py,0px)) translate(calc(var(--dx,0) * .5), calc(var(--dy,0) * -.7)) rotate(calc(var(--rot,0deg) * .7)); }
+    100% { transform: translate(var(--px,0px),var(--py,0px)); }
   }
   @media (prefers-reduced-motion: reduce){
     .hero-svg.doodles-float .hero-doodle,
@@ -1247,6 +1248,38 @@
 
     // filet de sécurité : si un setTimeout saute, tout respire au plus tard ici
     setTimeout(function(){ svg.classList.add('doodles-float'); }, last + 400);
+
+    /* --- brique C : parallaxe souris (effet de profondeur, se marie aux yeux) ---
+       chaque gribouillis se décale un peu selon la position de la souris ; les petits
+       coraux « devant » bougent plus, les mots / grands tracés « au fond » bougent moins. */
+    var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    if(fine.matches){
+      els.forEach(function(el){
+        var b = el._b;
+        var gentle = el._word || b.width > 520 || b.height > 360;
+        el._pAmp = gentle ? 4 : 10;                 // amplitude max, unités viewBox
+      });
+      var ptx = 0, pty = 0, pcx = 0, pcy = 0, praf = 0;
+      function ptick(){
+        pcx += (ptx - pcx) * 0.08;
+        pcy += (pty - pcy) * 0.08;
+        els.forEach(function(el){
+          el.style.setProperty('--px', (pcx * el._pAmp).toFixed(2) + 'px');
+          el.style.setProperty('--py', (pcy * el._pAmp).toFixed(2) + 'px');
+        });
+        if(Math.abs(ptx - pcx) > 0.0006 || Math.abs(pty - pcy) > 0.0006){
+          praf = requestAnimationFrame(ptick);
+        }else{ praf = 0; }
+      }
+      window.addEventListener('pointermove', function(e){
+        ptx = (e.clientX / window.innerWidth  - 0.5) * 2;   // -1 .. 1
+        pty = (e.clientY / window.innerHeight - 0.5) * 2;
+        if(!praf) praf = requestAnimationFrame(ptick);
+      }, { passive: true });
+      window.addEventListener('mouseleave', function(){
+        ptx = 0; pty = 0; if(!praf) praf = requestAnimationFrame(ptick);
+      });
+    }
   })();
 
   /* Yeux qui suivent la souris (hero desktop) */
