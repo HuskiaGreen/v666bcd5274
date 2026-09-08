@@ -216,6 +216,19 @@
     .doodle-live.is-floating{ animation: none !important; }
   }
 
+  /* « bienvenue dans mon univers » : le texte script s'écrit de gauche à droite
+     quand on le rejoint au scroll. La classe .script-wipe n'est posée que par le JS
+     (si le JS ne tourne pas, le texte s'affiche normalement). Les marges négatives
+     laissent respirer les jambages du script sans les rogner. */
+  .script-wipe{ clip-path: inset(-0.35em 100% -0.35em -0.2em); }
+  .script-wipe.is-wiped{
+    clip-path: inset(-0.35em -0.2em -0.35em -0.2em);
+    transition: clip-path 1.15s cubic-bezier(.6, 0, .35, 1);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .script-wipe, .script-wipe.is-wiped{ clip-path: none; transition: none; }
+  }
+
   /* ---------- Section headings ---------- */
   .section-head{text-align:center; margin-bottom:44px;}
   .eyebrow{
@@ -1417,6 +1430,22 @@
       }, { threshold: 0.4, rootMargin: '0px 0px -8% 0px' });
 
       all.forEach(function(el, i){ el._di = i; io.observe(el); });
+    })();
+
+    // 3) « bienvenue dans mon univers » — le texte script s'écrit de gauche à
+    //    droite quand la carte « Qui suis-je » entre à l'écran (demande Lisa).
+    (function(){
+      var el = document.querySelector('#qui-suis-je .script');
+      if(!el || reduce) return;                 // reduced-motion : on laisse le texte en place
+      el.classList.add('script-wipe');
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(!e.isIntersecting) return;
+          io.unobserve(e.target);
+          requestAnimationFrame(function(){ e.target.classList.add('is-wiped'); });
+        });
+      }, { threshold: 0.75, rootMargin: '0px 0px -10% 0px' });
+      io.observe(el);
     })();
   })();
 
