@@ -1300,10 +1300,10 @@
      - hero mobile : étoile / trait / cœur / gouttes se tracent au chargement puis respirent
        (cœur + gouttes : amplitude réduite, ils bougeaient trop) ; feu d'artifice + cercle
        (~10 %) laissés fixes comme sur desktop ; pas de réaction de proximité (pas de curseur) ;
-     - traits ondulés sous les titres + trait haut-gauche du Contact : tracés à l'arrivée
-       au scroll, PAS de respiration (soulignés « de structure ») ;
-     - gribouillis pâles (~10-25 %) : nuages « Qui suis-je », smiley + éclair « Projets »,
-       flèche « Illustrations » -> respiration seule ;
+     - traits ondulés sous les titres + trait haut-gauche du Contact + volute du titre
+       « Illustrations » : tracés à l'arrivée au scroll, PAS de respiration (accrochés à un titre) ;
+     - respiration seule : nuages « Qui suis-je », smiley + éclair « Projets », flèche
+       « Illustrations », cœur du titre « Illustrations » (amplitude réduite) ;
      - étoiles « Mes outils » (100 %) : tracé au scroll puis respiration ;
      - les 2 gribouillis des boutons Contact (étoile + « ! ») : SUPPRIMÉS (retour Lisa). */
   (function(){
@@ -1315,8 +1315,9 @@
       var big = el.classList.contains('about-doodle')
              || el.classList.contains('hm-underline')
              || el.classList.contains('hm-circle');
-      // cœur + gouttes du hero mobile : bougeaient trop (retour Lisa) -> amplitude réduite
-      var k = (el.classList.contains('hm-heart') || el.classList.contains('hm-drops')) ? 0.5 : 1;
+      // petits gribouillis « cœur / gouttes » : amplitude réduite (retour Lisa, bougeaient trop)
+      var k = (el.classList.contains('hm-heart') || el.classList.contains('hm-drops')
+            || el.classList.contains('illus-heart')) ? 0.5 : 1;
       var r1 = seed(i + 1), r2 = seed(i + 8.3), r3 = seed(i + 27.7);
       el.classList.add('doodle-live');
       el.style.setProperty('--dur', (big ? 7 + r1 * 3 : 4.5 + r1 * 2.6).toFixed(2) + 's');
@@ -1389,13 +1390,14 @@
 
     // 2) RESTE DU SITE — déclenché quand le gribouillis entre à l'écran (IntersectionObserver)
     (function(){
-      // a) traits ondulés sous les titres + trait haut-gauche du Contact :
-      //    seulement tracés à l'arrivée (retour Lisa), PAS de respiration (soulignés « de structure »)
+      // a) traits ondulés sous les titres + trait haut-gauche du Contact + volute du titre
+      //    « Illustrations » : seulement tracés à l'arrivée (retour Lisa), PAS de respiration
+      //    (éléments « de structure », accrochés à un titre)
       var drawOnly = Array.prototype.slice.call(document.querySelectorAll(
-        '.section-squiggle, #contact .contact-left'));
-      // b) gribouillis pâles (~10-25 %) : respiration seule
+        '.section-squiggle, #contact .contact-left, #illustrations .illus-flourish'));
+      // b) respiration seule : gribouillis pâles (~10-25 %) + le cœur du titre « Illustrations »
       var faint = Array.prototype.slice.call(document.querySelectorAll(
-        '#qui-suis-je .about-doodle, #projets .section-doodle, #illustrations .illus-arrow'));
+        '#qui-suis-je .about-doodle, #projets .section-doodle, #illustrations .illus-arrow, #illustrations .illus-heart'));
       // c) gribouillis coraux à 100 % : tracé à l'arrivée puis respiration
       var solid = Array.prototype.slice.call(document.querySelectorAll(
         '#mes-outils .tools-stars'));
