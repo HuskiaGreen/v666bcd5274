@@ -738,6 +738,10 @@
     /* les petites étiquettes (Direction artistique / Print / Web…) : masquées en
        mobile, elles alourdissent les vignettes (retour Lisa) */
     #projets .card .tags{display:none;}
+    /* vignettes carrées (plus généreuses que le 16/10) + coin arrondi resserré,
+       calé sur le reste du site — 20px paraissait trop rond sur de petites cartes */
+    #projets .card{border-radius:14px;}
+    #projets .card .thumb{aspect-ratio:1/1;}
     .see-more{
       display:block; margin:26px auto 0; padding:12px 30px;
       font-family:inherit; font-weight:700; font-size:15px;
