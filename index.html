@@ -730,9 +730,11 @@
     .section-squiggle{width:min(52%,160px);}
     #projets .section-squiggle{margin-top:11px;}  /* un peu abaissé (était trop collé au titre) */
 
-    /* Projets : n'afficher que 3 cartes, le reste derrière « Voir plus » */
-    #projets .grid3 > .card:nth-child(n+4){display:none;}
-    #projets .projects-wrap.show-all .grid3 > .card:nth-child(n+4){display:block;}
+    /* Projets : grille 2×2, on affiche les 4 premières cartes, le reste
+       derrière « Voir plus » (plus aéré qu'une seule colonne — retour Lisa) */
+    #projets .grid3{grid-template-columns:1fr 1fr; gap:16px;}
+    #projets .grid3 > .card:nth-child(n+5){display:none;}
+    #projets .projects-wrap.show-all .grid3 > .card:nth-child(n+5){display:block;}
     .see-more{
       display:block; margin:26px auto 0; padding:12px 30px;
       font-family:inherit; font-weight:700; font-size:15px;
@@ -762,9 +764,13 @@
 
   @media (max-width:600px){
     .wrap, .nav-row{padding-left:20px; padding-right:20px;}
-    .grid3{grid-template-columns:1fr;}
-    /* Illustrations : cartes en paysage (le carré prend trop de place en mobile) */
+    /* Illustrations : 1 colonne + cartes en paysage (le carré prend trop de place
+       en mobile). Les Projets, eux, restent en 2×2 (voir plus haut). */
+    #illustrations .grid3{grid-template-columns:1fr;}
     #illustrations .card .thumb{aspect-ratio:16/10;}
+    /* Projets 2×2 : étiquettes un peu plus compactes pour tenir dans la colonne */
+    #projets .card .tags{padding:12px 12px 14px; gap:6px;}
+    #projets .tag{font-size:11.5px; padding:4px 10px;}
     .about-card{padding:56px 24px 50px;}
     .about-body{margin-top:10px; padding:0 6px;}
   }
@@ -1045,7 +1051,7 @@
     host.appendChild(c);
   })();
 
-  // Projets (mobile) : « Voir plus » révèle les 3 cartes cachées, « Voir moins » les recache
+  // Projets (mobile) : « Voir plus » révèle les cartes au-delà des 4 premières, « Voir moins » les recache
   (function(){
     var btn = document.querySelector('#projets .see-more');
     var wrap = document.querySelector('#projets .projects-wrap');
