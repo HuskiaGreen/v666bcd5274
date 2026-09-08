@@ -1255,9 +1255,14 @@
        s'ajoutent à la respiration. Chaque gribouillis revient tout seul à sa place. */
     var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
     if(fine.matches){
-      els.forEach(function(el){ el._ox = 0; el._oy = 0; });
+      // décalage max, px écran : plus doux sur les petits gribouillis coraux (retour Lisa),
+      // gardé plus marqué sur les mots / grands tracés qui « portent » mieux le mouvement
+      els.forEach(function(el){
+        var b = el._b;
+        var gentle = el._word || b.width > 520 || b.height > 360;
+        el._ox = 0; el._oy = 0; el._push = gentle ? 26 : 12;
+      });
       var mx = -99999, my = -99999, praf = 0;
-      var PUSH = 26;                                  // décalage max, px écran
       function pscale(){ var r = svg.getBoundingClientRect(); return (r.width / svg.viewBox.baseVal.width) || 0.8; }
       function ploop(){
         var s = pscale(), moving = false;
@@ -1269,8 +1274,8 @@
           var dist = Math.sqrt(dx * dx + dy * dy) || 1;
           var R = Math.max(r.width, r.height) / 2 + 110; // rayon d'influence autour du gribouillis
           var f = dist < R ? Math.pow(1 - dist / R, 2) : 0;
-          var tx = (dx / dist) * f * PUSH / s;           // pousse à l'opposé du curseur, en unités viewBox
-          var ty = (dy / dist) * f * PUSH / s;
+          var tx = (dx / dist) * f * el._push / s;       // pousse à l'opposé du curseur, en unités viewBox
+          var ty = (dy / dist) * f * el._push / s;
           el._ox += (tx - el._ox) * 0.16;
           el._oy += (ty - el._oy) * 0.16;
           el.style.setProperty('--px', el._ox.toFixed(2) + 'px');
