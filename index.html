@@ -1255,12 +1255,11 @@
        s'ajoutent à la respiration. Chaque gribouillis revient tout seul à sa place. */
     var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
     if(fine.matches){
-      // décalage max, px écran : plus doux sur les petits gribouillis coraux (retour Lisa),
-      // gardé plus marqué sur les mots / grands tracés qui « portent » mieux le mouvement
+      // décalage max, px écran : effet marqué sur les MOTS (ils le portent bien),
+      // doux sur tous les gribouillis coraux, y compris le double trait large sous
+      // « Artistique » (retour Lisa : il était trop fort car classé comme un mot)
       els.forEach(function(el){
-        var b = el._b;
-        var gentle = el._word || b.width > 520 || b.height > 360;
-        el._ox = 0; el._oy = 0; el._push = gentle ? 26 : 8;
+        el._ox = 0; el._oy = 0; el._push = el._word ? 26 : 8;
       });
       var mx = -99999, my = -99999, praf = 0;
       function pscale(){ var r = svg.getBoundingClientRect(); return (r.width / svg.viewBox.baseVal.width) || 0.8; }
