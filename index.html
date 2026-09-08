@@ -735,6 +735,9 @@
     #projets .grid3{grid-template-columns:1fr 1fr; gap:16px;}
     #projets .grid3 > .card:nth-child(n+5){display:none;}
     #projets .projects-wrap.show-all .grid3 > .card:nth-child(n+5){display:block;}
+    /* les petites étiquettes (Direction artistique / Print / Web…) : masquées en
+       mobile, elles alourdissent les vignettes (retour Lisa) */
+    #projets .card .tags{display:none;}
     .see-more{
       display:block; margin:26px auto 0; padding:12px 30px;
       font-family:inherit; font-weight:700; font-size:15px;
@@ -768,9 +771,6 @@
        en mobile). Les Projets, eux, restent en 2×2 (voir plus haut). */
     #illustrations .grid3{grid-template-columns:1fr;}
     #illustrations .card .thumb{aspect-ratio:16/10;}
-    /* Projets 2×2 : étiquettes un peu plus compactes pour tenir dans la colonne */
-    #projets .card .tags{padding:12px 12px 14px; gap:6px;}
-    #projets .tag{font-size:11.5px; padding:4px 10px;}
     .about-card{padding:56px 24px 50px;}
     .about-body{margin-top:10px; padding:0 6px;}
   }
