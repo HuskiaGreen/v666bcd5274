@@ -204,6 +204,18 @@
     .hero-doodle.is-floating{ animation: none !important; }
   }
 
+  /* Gribouillis animés du hero mobile + du reste du site (respiration seule,
+     ou tracé au trait puis respiration pour ceux à 100 % d'opacité). Réutilise
+     les keyframes heroDoodleFloat ci-dessus (--px/--py y valent 0 par défaut). */
+  .doodle-live{ transform-box: border-box; transform-origin: 50% 50%; }
+  .doodle-live.is-floating{
+    will-change: transform;
+    animation: heroDoodleFloat var(--dur, 6s) ease-in-out 0s infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .doodle-live.is-floating{ animation: none !important; }
+  }
+
   /* ---------- Section headings ---------- */
   .section-head{text-align:center; margin-bottom:44px;}
   .eyebrow{
@@ -1289,6 +1301,117 @@
       window.addEventListener('mouseleave', function(){ mx = -99999; my = -99999; kick(); });
       window.addEventListener('scroll', kick, { passive: true });
     }
+  })();
+
+  /* Gribouillis animés — hero MOBILE + reste du site.
+     - respiration (flottement continu) sur tous les gribouillis « pleins » ;
+     - en plus, tracé au trait à l'apparition pour ceux à 100 % d'opacité
+       (hero mobile : étoile / trait / cœur / gouttes · Contact : étoile + « ! ») ;
+     - gribouillis pâles (~10-25 %) du reste du site : respiration seule ;
+     - gribouillis pâles du hero mobile (feu d'artifice, cercle) : rien, comme sur desktop ;
+     - pas de réaction de proximité ici (retour Lisa). */
+  (function(){
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function seed(i){ var x = Math.sin(i * 741.73) * 10000; return x - Math.floor(x); }
+
+    // respiration : amplitude en px écran (ces éléments sont positionnés en HTML)
+    function breathe(el, i){
+      var big = el.classList.contains('about-doodle')
+             || el.classList.contains('hm-underline')
+             || el.classList.contains('hm-circle');
+      var r1 = seed(i + 1), r2 = seed(i + 8.3), r3 = seed(i + 27.7);
+      el.classList.add('doodle-live');
+      el.style.setProperty('--dur', (big ? 7 + r1 * 3 : 4.5 + r1 * 2.6).toFixed(2) + 's');
+      el.style.setProperty('--dy',  ((big ? 4 : 6) + r3 * 4).toFixed(1) + 'px');
+      el.style.setProperty('--dx',  ((r1 - 0.5) * (big ? 5 : 8)).toFixed(1) + 'px');
+      el.style.setProperty('--rot', ((r2 - 0.5) * (big ? 1.6 : 4)).toFixed(2) + 'deg');
+    }
+    function startFloat(el){ el.classList.add('is-floating'); }
+
+    // tracé au trait des <path> contenus dans `host` (<svg> du hero mobile ou <span> du Contact)
+    function drawIn(host, baseDelay){
+      if(reduce) return baseDelay;
+      var paths = Array.prototype.slice.call(host.querySelectorAll('path'));
+      var end = baseDelay;
+      paths.forEach(function(p, k){
+        var L; try{ L = p.getTotalLength(); }catch(e){ L = 0; }
+        if(!L) return;
+        var delay = baseDelay + k * 130, dur = 900;
+        var ghost = p.cloneNode(false);
+        ghost.setAttribute('class', 'hero-doodle-ghost');
+        ghost.style.fill = 'none';
+        ghost.style.stroke = getComputedStyle(p).fill;
+        ghost.style.strokeWidth = '2';
+        ghost.style.strokeLinecap = 'round';
+        ghost.style.strokeLinejoin = 'round';
+        ghost.style.strokeDasharray = L + ' ' + L;
+        ghost.style.strokeDashoffset = L;
+        p.parentNode.insertBefore(ghost, p.nextSibling);
+        p.style.opacity = '0';
+        ghost.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
+          { duration: dur, delay: delay, easing: 'cubic-bezier(.65,0,.35,1)', fill: 'both' });
+        setTimeout(function(){
+          p.style.transition = 'opacity .3s ease';
+          p.style.opacity = '';
+          ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
+          setTimeout(function(){ ghost.remove(); }, 360);
+        }, delay + dur);
+        end = Math.max(end, delay + dur + 340);
+      });
+      return end;
+    }
+
+    // 1) HERO MOBILE — ne s'anime que quand la version mobile est réellement affichée
+    (function(){
+      var host = document.querySelector('.hero-m');
+      if(!host) return;
+      var done = false;
+      function run(){
+        if(done || getComputedStyle(host).display === 'none') return;
+        done = true;
+        // .hm-fw et .hm-circle (~10 %) : laissés fixes, comme sur le hero desktop
+        var full = ['.hm-star', '.hm-underline', '.hm-heart', '.hm-drops'];
+        var t = 260;
+        full.forEach(function(sel, i){
+          var svg = host.querySelector(sel);
+          if(!svg) return;
+          breathe(svg, i + 3);
+          if(reduce){ startFloat(svg); return; }
+          var end = drawIn(svg, t);
+          t += 400;
+          setTimeout(function(){ startFloat(svg); }, end);
+        });
+      }
+      run();                                   // cas normal : chargement direct sur mobile
+      if(!done && window.matchMedia){           // sinon : si on passe en affichage mobile plus tard
+        var mq = window.matchMedia('(max-width: 700px)');
+        (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(run);
+      }
+    })();
+
+    // 2) RESTE DU SITE — respiration quand le gribouillis entre à l'écran ;
+    //    tracé en plus pour les gribouillis à 100 % (Contact)
+    (function(){
+      var faint = Array.prototype.slice.call(document.querySelectorAll(
+        '#qui-suis-je .about-doodle, #projets .section-doodle, #illustrations .illus-arrow'));
+      var solid = Array.prototype.slice.call(document.querySelectorAll(
+        '#contact .social-btn .doodle'));
+      var all = faint.concat(solid);
+      if(!all.length) return;
+
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(!e.isIntersecting) return;
+          var el = e.target; io.unobserve(el);
+          breathe(el, el._di);
+          if(reduce || faint.indexOf(el) > -1){ startFloat(el); return; }
+          var end = drawIn(el, 0);
+          setTimeout(function(){ startFloat(el); }, Math.max(end, 260));
+        });
+      }, { threshold: 0.4, rootMargin: '0px 0px -8% 0px' });
+
+      all.forEach(function(el, i){ el._di = i; io.observe(el); });
+    })();
   })();
 
   /* Yeux qui suivent la souris (hero desktop) */
