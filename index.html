@@ -218,15 +218,21 @@
 
   /* « bienvenue dans mon univers » : le texte script s'écrit de gauche à droite
      quand on le rejoint au scroll. La classe .script-wipe n'est posée que par le JS
-     (si le JS ne tourne pas, le texte s'affiche normalement). Les marges négatives
-     laissent respirer les jambages du script sans les rogner. */
-  .script-wipe{ clip-path: inset(-0.35em 100% -0.35em -0.2em); }
+     (si le JS ne tourne pas, aucun clip → le texte s'affiche normalement).
+     .is-wiped joue le balayage puis, l'animation finie (forwards) ET clip-path
+     remis à `none`, le texte reste visible même si l'anim est interrompue.
+     Les marges négatives laissent respirer les jambages du script. */
+  @keyframes scriptWipeIn{
+    from{ clip-path: inset(-0.4em calc(100% + 0.2em) -0.4em -0.2em); }
+    to{   clip-path: inset(-0.4em -0.2em -0.4em -0.2em); }
+  }
+  .script-wipe{ clip-path: inset(-0.4em calc(100% + 0.2em) -0.4em -0.2em); }
   .script-wipe.is-wiped{
-    clip-path: inset(-0.35em -0.2em -0.35em -0.2em);
-    transition: clip-path 1.15s cubic-bezier(.6, 0, .35, 1);
+    clip-path: none;
+    animation: scriptWipeIn 1.15s cubic-bezier(.6, 0, .35, 1) forwards;
   }
   @media (prefers-reduced-motion: reduce){
-    .script-wipe, .script-wipe.is-wiped{ clip-path: none; transition: none; }
+    .script-wipe, .script-wipe.is-wiped{ clip-path: none; animation: none; }
   }
 
   /* ---------- Section headings ---------- */
@@ -1434,18 +1440,43 @@
 
     // 3) « bienvenue dans mon univers » — le texte script s'écrit de gauche à
     //    droite quand la carte « Qui suis-je » entre à l'écran (demande Lisa).
+    //    Révélation à déclencheurs multiples + filet de sécurité : le texte ne
+    //    peut jamais rester caché (contrôle manuel au scroll + IO + timeout).
     (function(){
       var el = document.querySelector('#qui-suis-je .script');
       if(!el || reduce) return;                 // reduced-motion : on laisse le texte en place
       el.classList.add('script-wipe');
-      var io = new IntersectionObserver(function(entries){
-        entries.forEach(function(e){
-          if(!e.isIntersecting) return;
-          io.unobserve(e.target);
-          requestAnimationFrame(function(){ e.target.classList.add('is-wiped'); });
-        });
-      }, { threshold: 0.75, rootMargin: '0px 0px -10% 0px' });
-      io.observe(el);
+      var done = false;
+      function reveal(){                         // chemin normal : joue le balayage
+        if(done) return;
+        done = true;
+        window.removeEventListener('scroll', check);
+        window.removeEventListener('resize', check);
+        el.classList.add('is-wiped');
+      }
+      function check(){
+        var r = el.getBoundingClientRect();
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        // le haut du texte est entré dans les 88 % supérieurs de l'écran
+        if(r.top < vh * 0.88 && r.bottom > 0) reveal();
+      }
+      check();                                  // déjà visible au chargement ?
+      if(!done){
+        window.addEventListener('scroll', check, { passive: true });
+        window.addEventListener('resize', check);
+        if('IntersectionObserver' in window){
+          var io = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){ if(e.isIntersecting){ io.disconnect(); reveal(); } });
+          }, { threshold: 0.35, rootMargin: '0px 0px -8% 0px' });
+          io.observe(el);
+        }
+        setTimeout(check, 1200);                 // rattrapage si le layout n'était pas prêt
+        // filet de sécurité ultime : si rien n'a déclenché le balayage au bout de
+        // 6 s, on retire le masque sans animation — le texte ne reste jamais caché
+        setTimeout(function(){
+          if(!done){ done = true; el.style.setProperty('clip-path', 'none', 'important'); }
+        }, 6000);
+      }
     })();
   })();
 
