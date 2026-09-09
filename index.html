@@ -636,7 +636,10 @@
   .pm-gallery{margin-top:clamp(40px,5vw,64px); display:flex; flex-direction:column; gap:clamp(26px,3.2vw,48px);}
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:transparent;}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(20px,2.4vw,36px);}
-  .pm-row > img{flex:1 1 0; width:0; min-width:0;}
+  /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
+  .pm-row > img{flex:1 1 0; width:0; min-width:0; aspect-ratio:var(--pm-ar, auto); height:auto;}
+  .pm-row[data-fit="cover"] > img{object-fit:cover;}
+  .pm-row[data-fit="contain"] > img{object-fit:contain;}
   @media (prefers-reduced-motion:reduce){ .pm-scrim,.pm-panel{animation:none;} }
   @media (max-width:600px){
     .pm-panel{margin:0; min-height:100%; border-radius:0;}
@@ -644,7 +647,7 @@
     .pm-body{padding:2px 18px 40px;}
     .pm-gallery{gap:16px;}
     .pm-row{flex-direction:column; gap:16px;}
-    .pm-row > img{width:100%;}
+    .pm-row > img{width:100%; aspect-ratio:auto;}
     .pm-gallery img{border-radius:10px;}
   }
 
@@ -1803,16 +1806,19 @@
         ],
         alt: 'Packaging de la gamme MDD Oscaro',
         dir: 'assets/projets/oscaro-mdd/',
-        /* galerie : chaque entrée = une ligne. 1 photo = pleine largeur ; 2 photos = côte à côte
-           (desktop uniquement — en mobile elles repassent l'une sous l'autre). [fichier, largeur, hauteur] */
+        /* galerie : chaque entrée = une ligne. imgs = 1 photo (pleine largeur) ou 2 (côte à côte
+           en desktop, empilées en mobile). [fichier, largeur, hauteur].
+           fit : 'cover' = les 2 photos remplissent une case de même hauteur (photos cadrées) ;
+                 'contain' = visuels détourés, affichés entiers dans une case de même hauteur
+                 (les 2 cases sont alignées, la marge est transparente). */
         rows: [
-          [ ['01.webp',1500,844] ],
-          [ ['02.webp',1500,844], ['03.webp',1500,844] ],
-          [ ['04.webp',1500,675] ],
-          [ ['05.webp',1500,1173], ['06.webp',1500,1007] ],
-          [ ['07.webp',1500,844] ],
-          [ ['08.webp',1500,1093], ['09.webp',1500,859] ],
-          [ ['10.webp',1500,844] ]
+          { imgs:[ ['01.webp',1500,844] ] },
+          { imgs:[ ['02.webp',1500,844], ['03.webp',1500,844] ], fit:'cover' },
+          { imgs:[ ['04.webp',1500,675] ] },
+          { imgs:[ ['05.webp',1500,1173], ['06.webp',1500,1007] ], fit:'contain' },
+          { imgs:[ ['07.webp',1500,844] ] },
+          { imgs:[ ['08.webp',1500,1093], ['09.webp',1500,859] ], fit:'contain' },
+          { imgs:[ ['10.webp',1500,844] ] }
         ]
       }
     };
@@ -1831,9 +1837,9 @@
       });
       galEl.textContent = '';
       var seen = 0;
-      var total = d.rows.reduce(function(s, r){ return s + r.length; }, 0);
+      var total = d.rows.reduce(function(s, r){ return s + r.imgs.length; }, 0);
       d.rows.forEach(function(row){
-        var made = row.map(function(im0){
+        var made = row.imgs.map(function(im0){
           seen++;
           var im = document.createElement('img');
           im.src = d.dir + im0[0];
@@ -1848,6 +1854,10 @@
         } else {
           var r = document.createElement('div');
           r.className = 'pm-row';
+          if(row.fit) r.setAttribute('data-fit', row.fit);
+          /* hauteur commune aux 2 cases : ratio = moyenne des ratios de la paire */
+          var ar = row.imgs.reduce(function(s, x){ return s + x[1] / x[2]; }, 0) / row.imgs.length;
+          r.style.setProperty('--pm-ar', ar.toFixed(4));
           made.forEach(function(im){ r.appendChild(im); });
           galEl.appendChild(r);
         }
