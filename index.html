@@ -445,16 +445,34 @@
     display:flex; align-items:center; justify-content:center; color:var(--text-muted);
   }
   .card .thumb img{width:100%; height:100%; object-fit:cover;}
-  /* Cartes projet cliquables (elles ouvrent une fiche projet) : léger soulèvement au survol */
-  #projets .card[data-project]{transition:transform .18s ease, box-shadow .18s ease;}
+  /* Cartes projet cliquables (elles ouvrent une fiche projet) : même animation que les Illustrations
+     — contour + halo corail + léger soulèvement + petite rotation « de travers » */
+  #projets .card[data-project]{
+    cursor:var(--cursor-pointer);
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
   #projets .card[data-project]:hover,
   #projets .card[data-project]:focus-visible{
-    transform:translateY(-4px);
-    box-shadow:0 28px 55px -22px rgba(28,28,28,.45);
-    outline:none;
+    transform:translateY(-4px) rotate(-1.5deg); outline:none;
+    box-shadow:0 0 0 2px rgba(237,110,116,.6), 0 18px 40px -16px rgba(237,110,116,.45);
   }
-  #projets .card[data-project]:focus-visible{outline:2px solid var(--coral); outline-offset:4px;}
-  @media (prefers-reduced-motion:reduce){ #projets .card[data-project]:hover, #projets .card[data-project]:focus-visible{transform:none;} }
+  #projets .card[data-project]:nth-child(n+2):hover,
+  #projets .card[data-project]:nth-child(n+2):focus-visible{
+    transform:translateY(-4px) rotate(1.5deg);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) #projets .card[data-project]:hover,
+    :root:not([data-theme="light"]) #projets .card[data-project]:focus-visible{
+      box-shadow:0 0 0 2px rgba(240,134,139,.55);
+    }
+  }
+  :root[data-theme="dark"] #projets .card[data-project]:hover,
+  :root[data-theme="dark"] #projets .card[data-project]:focus-visible{
+    box-shadow:0 0 0 2px rgba(240,134,139,.55);
+  }
+  @media (prefers-reduced-motion: reduce){
+    #projets .card[data-project]:hover, #projets .card[data-project]:focus-visible{transform:none;}
+  }
   /* Illustrations : cartes carrées, comme dans le SVG source (542×542) */
   #illustrations .card .thumb{aspect-ratio:1/1;}
   .placeholder-thumb{
@@ -584,7 +602,7 @@
   .project-modal.is-open{display:block;}
   .pm-scrim{position:fixed; inset:0; background:rgba(14,13,16,.82); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); animation:lb-fade .18s ease;}
   .pm-panel{
-    position:relative; z-index:1; max-width:940px;
+    position:relative; z-index:1; max-width:800px;
     margin:clamp(16px,5vw,64px) auto;
     background:var(--surface); color:var(--text);
     border-radius:22px; box-shadow:0 40px 90px -30px rgba(0,0,0,.55);
@@ -593,22 +611,30 @@
   @keyframes pm-rise{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;}}
   .pm-topbar{
     position:sticky; top:0; z-index:3; display:flex; justify-content:flex-end;
-    padding:12px 12px 0; background:var(--surface); border-radius:22px 22px 0 0;
+    padding:14px 14px 0; background:var(--surface); border-radius:22px 22px 0 0;
   }
-  .pm-close{position:relative;}
-  .pm-body{padding:4px clamp(24px,5vw,52px) clamp(28px,5vw,52px);}
-  .pm-head{max-width:62ch;}
+  /* croix : suit le thème (fond clair en clair, fond sombre en sombre) — au contraire de la lightbox */
+  .pm-close{position:relative; background:var(--surface); color:var(--coral); border-color:var(--coral);}
+  .pm-body{padding:6px clamp(24px,5vw,52px) clamp(40px,7vw,72px);}
+  .pm-head{max-width:66ch;}
   .pm-title{font-family:"Lato",sans-serif; font-weight:900; color:var(--coral); font-size:clamp(28px,5vw,44px); line-height:1.06; margin:0;}
-  .pm-tags{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 0;}
-  .pm-intro{margin-top:22px; color:var(--text-muted); font-size:clamp(15px,1.5vw,17px); line-height:1.72;}
-  .pm-intro p{margin:0 0 14px;}
+  .pm-tags{display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 0;}
+  .pm-intro{margin-top:24px; color:var(--text-muted); font-size:clamp(15px,1.5vw,17px); line-height:1.75;}
+  .pm-intro p{margin:0 0 16px;}
   .pm-intro p:last-child{margin-bottom:0;}
-  .pm-gallery{margin-top:clamp(26px,4vw,40px); display:flex; flex-direction:column; gap:clamp(14px,2.4vw,22px);}
+  /* galerie : lignes de 1 ou 2 photos (desktop) ; toujours une par une en mobile */
+  .pm-gallery{margin-top:clamp(36px,6vw,56px); display:flex; flex-direction:column; gap:clamp(20px,3.4vw,34px);}
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:var(--surface-2);}
+  .pm-row{display:flex; align-items:flex-start; gap:clamp(16px,2.6vw,26px);}
+  .pm-row > img{flex:1 1 0; width:0; min-width:0;}
   @media (prefers-reduced-motion:reduce){ .pm-scrim,.pm-panel{animation:none;} }
   @media (max-width:600px){
     .pm-panel{margin:0; min-height:100%; border-radius:0;}
     .pm-topbar{border-radius:0;}
+    .pm-body{padding:2px 18px 40px;}
+    .pm-gallery{gap:16px;}
+    .pm-row{flex-direction:column; gap:16px;}
+    .pm-row > img{width:100%;}
     .pm-gallery img{border-radius:10px;}
   }
 
@@ -1765,11 +1791,16 @@
         ],
         alt: 'Packaging de la gamme MDD Oscaro',
         dir: 'assets/projets/oscaro-mdd/',
-        images: [
-          ['01.webp',1500,844], ['02.webp',1500,844], ['03.webp',1500,844],
-          ['04.webp',1500,675], ['05.webp',1500,1173], ['06.webp',1500,1007],
-          ['07.webp',1500,844], ['08.webp',1500,1092], ['09.webp',1500,859],
-          ['10.webp',1500,844]
+        /* galerie : chaque entrée = une ligne. 1 photo = pleine largeur ; 2 photos = côte à côte
+           (desktop uniquement — en mobile elles repassent l'une sous l'autre). [fichier, largeur, hauteur] */
+        rows: [
+          [ ['01.webp',1500,844] ],
+          [ ['02.webp',1500,844], ['03.webp',1500,844] ],
+          [ ['04.webp',1500,675] ],
+          [ ['05.webp',1500,1173], ['06.webp',1500,1007] ],
+          [ ['07.webp',1500,844] ],
+          [ ['08.webp',1500,1093], ['09.webp',1500,859] ],
+          [ ['10.webp',1500,844] ]
         ]
       }
     };
@@ -1787,14 +1818,27 @@
         var el = document.createElement('p'); el.textContent = p; introEl.appendChild(el);
       });
       galEl.textContent = '';
-      d.images.forEach(function(im0, i){
-        var im = document.createElement('img');
-        im.src = d.dir + im0[0];
-        im.width = im0[1]; im.height = im0[2];   /* r\u00e9serve le ratio -> pas de saut de mise en page au chargement */
-        im.loading = i < 2 ? 'eager' : 'lazy';
-        im.decoding = 'async';
-        im.alt = d.alt + ' \u2014 visuel ' + (i + 1) + ' sur ' + d.images.length;
-        galEl.appendChild(im);
+      var seen = 0;
+      var total = d.rows.reduce(function(s, r){ return s + r.length; }, 0);
+      d.rows.forEach(function(row){
+        var made = row.map(function(im0){
+          seen++;
+          var im = document.createElement('img');
+          im.src = d.dir + im0[0];
+          im.width = im0[1]; im.height = im0[2];   /* r\u00e9serve le ratio -> pas de saut de mise en page au chargement */
+          im.loading = seen <= 2 ? 'eager' : 'lazy';
+          im.decoding = 'async';
+          im.alt = d.alt + ' \u2014 visuel ' + seen + ' sur ' + total;
+          return im;
+        });
+        if(made.length === 1){
+          galEl.appendChild(made[0]);
+        } else {
+          var r = document.createElement('div');
+          r.className = 'pm-row';
+          made.forEach(function(im){ r.appendChild(im); });
+          galEl.appendChild(r);
+        }
       });
       return true;
     }
