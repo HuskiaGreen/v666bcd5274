@@ -633,7 +633,7 @@
   }
   /* galerie : lignes de 1 ou 2 photos (desktop) ; toujours une par une en mobile.
      Fond transparent : les visuels détourés reposent sur la couleur du panneau (suit le thème). */
-  .pm-gallery{margin-top:clamp(44px,5.5vw,72px); display:flex; flex-direction:column; gap:clamp(40px,5vw,72px);}
+  .pm-gallery{margin-top:clamp(48px,6vw,84px); display:flex; flex-direction:column; gap:clamp(60px,7.5vw,108px);}
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:transparent;}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
@@ -645,8 +645,8 @@
     .pm-panel{margin:0; min-height:100%; border-radius:0;}
     .pm-topbar{border-radius:0;}
     .pm-body{padding:2px 18px 40px;}
-    .pm-gallery{gap:26px;}
-    .pm-row{flex-direction:column; gap:26px;}
+    .pm-gallery{gap:40px;}
+    .pm-row{flex-direction:column; gap:40px;}
     .pm-row > img{width:100%; aspect-ratio:auto;}
     .pm-gallery img{border-radius:10px;}
   }
