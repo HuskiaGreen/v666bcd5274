@@ -221,22 +221,23 @@
     .doodle-live.is-floating{ animation: none !important; }
   }
 
-  /* « bienvenue dans mon univers » : chaque mot se dévoile de gauche à droite,
-     l'un après l'autre, à cadence d'écriture, quand on rejoint la carte au scroll.
+  /* « bienvenue dans mon univers » : la phrase s'écrit d'un seul geste continu,
+     de gauche à droite, à cadence d'écriture, quand on rejoint la carte au scroll.
      La classe .is-writing n'est posée que par le JS : sans JS (ou si le JS plante),
      aucun clip → toute la phrase reste visible. L'animation se termine sur l'état
-     « visible » (forwards) donc le mot ne peut pas rester coupé. */
-  @keyframes swWordIn{
-    from{ clip-path: inset(-8% 100% -8% -4%); }
-    to{   clip-path: inset(-8% -4% -8% -4%); }
+     « visible » (forwards) donc rien ne peut rester coupé. */
+  @keyframes swWrite{
+    from{ clip-path: inset(-10% 100% -10% -3%); }
+    to{   clip-path: inset(-10% -3% -10% -3%); }
   }
-  .script-draw.is-writing .sw-word{
-    clip-path: inset(-8% 100% -8% -4%);          /* caché : coupé à droite */
-    animation: swWordIn .75s cubic-bezier(.55, 0, .3, 1) forwards;
-    animation-delay: calc(var(--i, 0) * .8s);    /* les mots s'enchaînent (total ~3 s) */
+  .script-draw.is-writing svg{
+    clip-path: inset(-10% 100% -10% -3%);         /* caché : coupé à droite */
+    /* courbe proche du linéaire (vitesse d'écriture régulière), démarrage et
+       fin adoucis pour éviter l'à-coup */
+    animation: swWrite 4.5s cubic-bezier(.45, .05, .55, .95) forwards;
   }
   @media (prefers-reduced-motion: reduce){
-    .script-draw.is-writing .sw-word{ clip-path: none; animation: none; }
+    .script-draw.is-writing svg{ clip-path: none; animation: none; }
   }
 
   /* ---------- Section headings ---------- */
@@ -1546,27 +1547,27 @@
     })();
 
     // 3) « bienvenue dans mon univers » — les lettres vectorisées (asset de Lisa)
-    //    se dévoilent mot par mot, de gauche à droite, à cadence d'écriture, quand
-    //    la carte « Qui suis-je » entre à l'écran. Déclencheurs multiples + filet
-    //    de sécurité : la phrase ne peut jamais rester cachée.
+    //    s'écrivent d'un seul geste continu, de gauche à droite, à cadence
+    //    d'écriture, quand la carte « Qui suis-je » entre à l'écran. Déclencheurs
+    //    multiples + filet de sécurité : la phrase ne peut jamais rester cachée.
     (function(){
       var box = document.querySelector('#qui-suis-je .script-draw');
       if(!box || reduce) return;                 // reduced-motion : phrase laissée en place
-      var words = Array.prototype.slice.call(box.querySelectorAll('.sw-word'));
-      if(!words.length) return;
+      var svg = box.querySelector('svg');
+      if(!svg) return;
       var done = false;
       function showAll(){                         // dévoile tout sans animation (filet)
-        words.forEach(function(w){ w.style.setProperty('clip-path', 'none', 'important'); });
+        svg.style.setProperty('clip-path', 'none', 'important');
       }
-      function reveal(){                          // chemin normal : joue l'écriture mot à mot
+      function reveal(){                          // chemin normal : joue l'écriture
         if(done) return;
         done = true;
         window.removeEventListener('scroll', check);
         window.removeEventListener('resize', check);
         box.classList.add('is-writing');
-        // l'écriture dure ~3,2 s ; si une animation reste bloquée, on force
+        // l'écriture dure ~4,2 s ; si l'animation reste bloquée, on force
         // l'état visible un peu après (marge confortable)
-        setTimeout(showAll, 5000);
+        setTimeout(showAll, 6000);
       }
       function check(){
         var r = box.getBoundingClientRect();
