@@ -633,9 +633,9 @@
   }
   /* galerie : lignes de 1 ou 2 photos (desktop) ; toujours une par une en mobile.
      Fond transparent : les visuels détourés reposent sur la couleur du panneau (suit le thème). */
-  .pm-gallery{margin-top:clamp(40px,5vw,64px); display:flex; flex-direction:column; gap:clamp(26px,3.2vw,48px);}
+  .pm-gallery{margin-top:clamp(44px,5.5vw,72px); display:flex; flex-direction:column; gap:clamp(40px,5vw,72px);}
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:transparent;}
-  .pm-row{display:flex; align-items:flex-start; gap:clamp(20px,2.4vw,36px);}
+  .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
   .pm-row > img{flex:1 1 0; width:0; min-width:0; aspect-ratio:var(--pm-ar, auto); height:auto;}
   .pm-row[data-fit="cover"] > img{object-fit:cover;}
@@ -645,8 +645,8 @@
     .pm-panel{margin:0; min-height:100%; border-radius:0;}
     .pm-topbar{border-radius:0;}
     .pm-body{padding:2px 18px 40px;}
-    .pm-gallery{gap:16px;}
-    .pm-row{flex-direction:column; gap:16px;}
+    .pm-gallery{gap:26px;}
+    .pm-row{flex-direction:column; gap:26px;}
     .pm-row > img{width:100%; aspect-ratio:auto;}
     .pm-gallery img{border-radius:10px;}
   }
@@ -1815,9 +1815,9 @@
           { imgs:[ ['01.webp',1500,844] ] },
           { imgs:[ ['02.webp',1500,844], ['07.webp',1500,844] ], fit:'cover' },
           { imgs:[ ['05.webp',1500,1173], ['06.webp',1500,1007] ], fit:'contain' },
-          { imgs:[ ['04.webp',1500,539] ] },
+          { imgs:[ ['04.webp',1500,624] ] },
           { imgs:[ ['03.webp',1500,844] ] },
-          { imgs:[ ['08.webp',1500,1341], ['09.webp',1500,556] ], fit:'contain' },
+          { imgs:[ ['08.webp',1500,1341], ['09.webp',1500,556] ], fit:'contain', ar:1.6 },
           { imgs:[ ['10.webp',1500,844] ] }
         ]
       }
@@ -1855,8 +1855,8 @@
           var r = document.createElement('div');
           r.className = 'pm-row';
           if(row.fit) r.setAttribute('data-fit', row.fit);
-          /* hauteur commune aux 2 cases : ratio = moyenne des ratios de la paire */
-          var ar = row.imgs.reduce(function(s, x){ return s + x[1] / x[2]; }, 0) / row.imgs.length;
+          /* hauteur commune aux 2 cases : ratio imposé (row.ar) sinon moyenne des ratios de la paire */
+          var ar = row.ar || row.imgs.reduce(function(s, x){ return s + x[1] / x[2]; }, 0) / row.imgs.length;
           r.style.setProperty('--pm-ar', ar.toFixed(4));
           made.forEach(function(im){ r.appendChild(im); });
           galEl.appendChild(r);
