@@ -648,7 +648,8 @@
     .pm-topbar{border-radius:0;}
     .pm-body{padding:2px 18px 40px;}
     .pm-gallery{gap:40px;}
-    .pm-gallery > :nth-child(2){margin-top:-14px;}
+    /* en mobile toutes les photos sont empilees -> ecart uniforme, pas de resserrage du 1er */
+    .pm-gallery > :nth-child(2){margin-top:0;}
     .pm-row{flex-direction:column; gap:40px;}
     .pm-row > img{width:100%; aspect-ratio:auto;}
     .pm-gallery img{border-radius:10px;}
