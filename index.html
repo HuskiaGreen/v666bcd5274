@@ -669,10 +669,18 @@
     /* écart resserré spécifiquement ENTRE les bandeaux en mobile (row.tightMobile) -> indépendant
        du resserrage desktop (.pm-tight, désactivé ci-dessus en mobile). */
     .pm-gallery > .pm-tight-m{margin-top:-20px;}
+    /* écart avant/après Disneyland en mobile : le calcul desktop (clamp*1.6) donnait ~96px, pas assez
+       visible sur petit écran -> valeur fixe plus généreuse dédiée au mobile. */
+    .pm-gallery > .pm-loose{margin-top:120px;}
     .pm-row{flex-direction:column; gap:40px;}
-    .pm-row.pm-mobile-row{flex-direction:row; gap:clamp(10px,3vw,20px); --rg:clamp(10px,3vw,20px); max-width:none; margin:0;}
+    /* margin-left/right (pas le raccourci margin) : ne pas écraser le margin-top posé par
+       .pm-loose sur cette même ligne (Disneyland cumule mobile-row + loose). */
+    .pm-row.pm-mobile-row{flex-direction:row; gap:clamp(10px,3vw,20px); --rg:clamp(10px,3vw,20px); max-width:none; margin-left:0; margin-right:0;}
     .pm-row > img{width:100%; height:auto; aspect-ratio:auto; flex:none;}
     .pm-row.pm-mobile-row > img{width:calc((100% - var(--rg)) * var(--wf, 1)); height:auto; flex:0 0 auto;}
+    /* bandeaux en mobile : trop petits en restant dans la marge du texte -> pleine largeur d'écran
+       (bord à bord), retire la marge de .pm-body (18px de chaque côté) juste pour ces lignes. */
+    .pm-row.pm-bleed{width:calc(100% + 36px); margin-left:-18px; margin-right:-18px;}
     .pm-gallery img{border-radius:10px;}
   }
 
@@ -1867,11 +1875,11 @@
           { imgs:[ ['02.webp',696,493], ['03.webp',702,493] ], fit:'cover', tight:true },
           { imgs:[ ['04.webp',1425,824] ], tight:true },
           { imgs:[ ['05.webp',267,1544], ['06.webp',552,1545] ], fit:'natural', width:65, loose:true, mobileRow:true },
-          { imgs:[ ['07.webp',1152,314], ['08.webp',576,314] ], fit:'natural', loose:true },
-          { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural', tight:true, tightMobile:true },
-          { imgs:[ ['11.webp',936,253], ['12.webp',467,252] ], fit:'natural', tight:true, tightMobile:true },
-          { imgs:[ ['13.webp',938,253], ['14.webp',467,252] ], fit:'natural', tight:true, tightMobile:true },
-          { imgs:[ ['15.webp',938,253], ['16.webp',467,252] ], fit:'natural', tight:true, tightMobile:true }
+          { imgs:[ ['07.webp',1152,314], ['08.webp',576,314] ], fit:'natural', loose:true, mobileBleed:true },
+          { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural', tight:true, tightMobile:true, mobileBleed:true },
+          { imgs:[ ['11.webp',936,253], ['12.webp',467,252] ], fit:'natural', tight:true, tightMobile:true, mobileBleed:true },
+          { imgs:[ ['13.webp',938,253], ['14.webp',467,252] ], fit:'natural', tight:true, tightMobile:true, mobileBleed:true },
+          { imgs:[ ['15.webp',938,253], ['16.webp',467,252] ], fit:'natural', tight:true, tightMobile:true, mobileBleed:true }
         ]
       }
     };
@@ -1913,6 +1921,7 @@
           if(row.loose) r.classList.add('pm-loose');
           if(row.tightMobile) r.classList.add('pm-tight-m');
           if(row.mobileRow) r.classList.add('pm-mobile-row');
+          if(row.mobileBleed) r.classList.add('pm-bleed');
           if(row.fit) r.setAttribute('data-fit', row.fit);
           if(row.fit === 'natural'){
             /* pas de ratio commun : la largeur de chaque photo (fraction 0..1 de la place restante
