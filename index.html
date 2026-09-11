@@ -2086,6 +2086,11 @@
           a.className = 'pm-dl-btn';
           a.href = d.dir + row.download.file;
           a.download = row.download.file;
+          /* Safari mobile n'honore pas `download` sur un PDF -> navigue dans l'onglet du site au
+             lieu de télécharger (retour Lisa). target="_blank" sert de filet : ignoré là où
+             `download` fonctionne (desktop), pris en compte là où ce n'est pas le cas (mobile). */
+          a.target = '_blank';
+          a.rel = 'noopener';
           a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>' + row.download.label;
           dl.appendChild(a);
           galEl.appendChild(dl);
