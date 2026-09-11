@@ -64,6 +64,7 @@
       --hero-ink:#c4c2bf;
       --avatar-shadow:drop-shadow(0 22px 40px rgba(0,0,0,.5));
       --scrim:rgba(0,0,0,.45);
+      --pm-outline-c:#f3f1ef;
     }
   }
   :root[data-theme="dark"]{
@@ -72,6 +73,7 @@
     --surface-2:#2c2a2f;
     --text:#f3f1ef;
     --text-muted:#b6b1b6;
+    --pm-outline-c:#f3f1ef;
     --coral:#f0868b;
     --coral-soft:#3a2528;
     --navy:#9aa3e0;
@@ -677,11 +679,16 @@
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:transparent;}
   /* contour très léger, réservé aux visuels à fond blanc/clair (posé par photo via un 4e élément
      [fichier,largeur,hauteur,{border:true}]) : sans lui, le fond se confond avec le panneau en
-     thème clair. Couleur FIXE (pas theme-aware, contrairement à --border) : la photo elle-même est
-     blanche dans les 2 thèmes (elle ne change pas avec --surface), donc un contour clair en thème
-     sombre (essayé en 1re passe) se retrouve clair-sur-blanc = invisible ; un contour sombre reste
-     lisible sur du blanc quel que soit le thème du panneau autour. */
-  .pm-gallery img.pm-outline{box-shadow:inset 0 0 0 6px rgba(0,0,0,.35);}
+     thème clair. Ces photos ont en réalité un fond TRANSPARENT (pas blanc) : c'est le panneau qui
+     se voit à travers -> le contour doit donc bien être theme-aware (--pm-outline-c), contrairement
+     à ce qui avait été supposé lors des passes précédentes (couleur fixe sombre = invisible en
+     thème sombre, où le panneau derrière la transparence est lui-même sombre).
+     Couleur PLEINE (opaque, sans transparence) plutôt qu'un box-shadow semi-transparent : chez Lisa
+     (Chrome desktop + Safari mobile, wifi/4G, cache pourtant exclu) le contour semi-transparent
+     n'était visible qu'à un zoom précis et disparaissait en zoomant plus OU moins — signe d'un
+     rendu de transparence qui échoue à s'aligner sur les pixels selon le niveau de zoom. Un
+     border plein évite ce risque : même un pixel partiellement couvert reste franchement visible. */
+  .pm-gallery img.pm-outline{box-shadow:inset 0 0 0 4px var(--pm-outline-c, #262626);}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px); --rg:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
   .pm-row > img{flex:1 1 0; width:0; min-width:0; aspect-ratio:var(--pm-ar, auto); height:auto;}
