@@ -1804,6 +1804,11 @@
     var closeB  = modal.querySelector('.pm-close');
     var lastFocus = null;
 
+    /* casse-cache des visuels de fiche : les fichiers sont réutilisés (même nom, contenu qui change
+       d'une session à l'autre) -> sans ça, un navigateur qui a déjà ouvert une fiche garde l'ancienne
+       image en cache et affiche du contenu périmé. Incrémenter cette valeur à chaque changement d'assets. */
+    var ASSET_V = '2026-09-11b';
+
     var DATA = {
       'oscaro-mdd': {
         title: 'MDD Oscaro',
@@ -1832,7 +1837,7 @@
       },
       'fnac-spectacles': {
         title: 'Fnac Spectacles',
-        tags: ['Direction artistique', 'Édition', 'Web & mobile', 'Display'],
+        tags: ['Direction artistique', 'Édition', 'Web & mobile', 'Animation commerciale'],
         intro: [
           "Fnac Spectacles, c’est la billetterie qui met en avant concerts, one‑man‑shows et grands événements. J’y suis intervenue sur trois terrains à la fois : l’édition papier, une page éditoriale web et mobile, et l’animation commerciale au quotidien.",
           "Le magazine de Noël 2017 — le « Guide Noël » — sélectionne les spectacles à offrir. Mise en page rythmée, hiérarchie nette entre les têtes d’affiche et le reste de la programmation, pour un objet qu’on feuillette avec plaisir.",
@@ -1874,7 +1879,7 @@
         var made = row.imgs.map(function(im0){
           seen++;
           var im = document.createElement('img');
-          im.src = d.dir + im0[0];
+          im.src = d.dir + im0[0] + '?v=' + ASSET_V;
           im.width = im0[1]; im.height = im0[2];   /* r\u00e9serve le ratio -> pas de saut de mise en page au chargement */
           im.loading = seen <= 2 ? 'eager' : 'lazy';
           im.decoding = 'async';
