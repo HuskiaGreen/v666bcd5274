@@ -627,6 +627,17 @@
   .pm-intro{color:var(--text-muted); font-size:clamp(15px,1.15vw,18px); line-height:1.75;}
   .pm-intro p{margin:0 0 16px;}
   .pm-intro p:last-child{margin-bottom:0;}
+  /* liste à puces (ex. les 3 volets d'un projet) — alternative au paragraphe simple, posée via un
+     objet {items:[{label,text}]} dans d.intro plutôt qu'une chaîne. Générique, réutilisable par
+     n'importe quelle fiche projet. */
+  .pm-intro ul{list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:12px;}
+  .pm-intro ul:last-child{margin-bottom:0;}
+  .pm-intro li{position:relative; padding-left:22px;}
+  .pm-intro li::before{
+    content:''; position:absolute; left:0; top:.62em; width:6px; height:6px;
+    border-radius:50%; background:var(--coral);
+  }
+  .pm-intro li strong{color:var(--text); font-weight:700;}
   @media (max-width:900px){
     .pm-head{grid-template-columns:1fr; gap:0;}
     .pm-intro{margin-top:24px; max-width:70ch;}
@@ -1908,10 +1919,12 @@
         title: 'Fnac Spectacles',
         tags: ['Direction artistique', 'Édition', 'Web & mobile', 'Animation commerciale'],
         intro: [
-          "Fnac Spectacles, c’est la billetterie concerts, one‑man‑shows et grands événements. J’y ai touché à plusieurs choses : l’édition papier, l’éditorial web et mobile, et l’animation commerciale au quotidien.",
-          "Pour le magazine de Noël 2017, le Guide Noël, j’ai construit une mise en page rythmée, avec les têtes d’affiche bien mises en avant par rapport au reste de la programmation.",
-          "J’ai aussi conçu la page édito du festival Pirates & Princesses à Disneyland Paris, en version web et mobile, avec le visuel du festival, les offres de billets, le calendrier et une vidéo.",
-          "Des bandeaux commerciaux pour le site et l’application, en grand format et en carré — quelques exemples parmi des centaines réalisés au fil des campagnes."
+          "Acteur incontournable de la billetterie événementielle, Fnac Spectacles m’a permis de déployer ma créativité sur des supports très variés, alliant édition papier, design web/mobile et animation commerciale.",
+          { items: [
+            { label: 'Édition papier', text: 'Conception du Guide de Noël 2017, avec une hiérarchisation soignée et une mise en page rythmée pour détacher les têtes d’affiche du reste de la programmation.' },
+            { label: 'Éditorial Web & Mobile', text: 'Création de la landing page événementielle du festival Pirates & Princesses (Disneyland Paris), mêlant visuels clés, offres, calendrier et vidéo.' },
+            { label: 'Animation commerciale', text: 'Production de centaines de déclinaisons de bannières promotionnelles (formats larges et in-app) pour soutenir les opérations au quotidien.' }
+          ] }
         ],
         alt: 'Fnac Spectacles — magazine de Noël, page édito Disneyland Paris et bandeaux d’animation commerciale',
         dir: 'assets/projets/fnac-spectacles/',
@@ -1939,7 +1952,19 @@
       });
       introEl.textContent = '';
       d.intro.forEach(function(p){
-        var el = document.createElement('p'); el.textContent = p; introEl.appendChild(el);
+        if(typeof p === 'string'){
+          var el = document.createElement('p'); el.textContent = p; introEl.appendChild(el);
+        } else if(p.items){
+          var ul = document.createElement('ul');
+          p.items.forEach(function(it){
+            var li = document.createElement('li');
+            var strong = document.createElement('strong'); strong.textContent = it.label + ' : ';
+            li.appendChild(strong);
+            li.appendChild(document.createTextNode(it.text));
+            ul.appendChild(li);
+          });
+          introEl.appendChild(ul);
+        }
       });
       galEl.textContent = '';
       var seen = 0;
