@@ -668,8 +668,12 @@
   .pm-gallery > .pm-narrow{width:var(--nw,60%); margin-left:auto; margin-right:auto;}
   /* row.overlap : remonte l'image assez pour chevaucher le bas de la ligne précédente (ex. mockup
      smartphone détouré posé sur une capture desktop). Plus fort que .pm-tight (qui ne fait que
-     resserrer l'écart, sans chevauchement). z-index pour rester au-dessus du visuel du dessus. */
-  .pm-gallery > .pm-overlap{margin-top:calc(clamp(60px,7.5vw,108px) * -1.15); position:relative; z-index:2;}
+     resserrer l'écart, sans chevauchement). z-index pour rester au-dessus du visuel du dessus.
+     Intensité réglable par ligne (row.overlap = nombre, multiplie l'écart de base) via --ov,
+     posé par le JS ; DESKTOP UNIQUEMENT (annulé en mobile plus bas, cf. commentaire associé). */
+  @media (min-width:601px){
+    .pm-gallery > .pm-overlap{margin-top:calc(clamp(60px,7.5vw,108px) * -1 * var(--ov,1.15)); position:relative; z-index:2;}
+  }
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:transparent;}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px); --rg:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
@@ -720,9 +724,11 @@
     /* écart avant/après Disneyland en mobile : le calcul desktop (clamp*1.6) donnait ~96px, pas assez
        visible sur petit écran -> valeur fixe plus généreuse dédiée au mobile. */
     .pm-gallery > .pm-loose{margin-top:120px;}
-    /* même logique que .pm-tight ci-dessus : le calcul desktop (clamp*-1.15) est trop faible sur
-       petit écran (gap mobile fixe à 40px) -> valeur fixe dédiée. */
-    .pm-gallery > .pm-overlap{margin-top:-46px;}
+    /* le chevauchement (row.overlap) est réservé au desktop (règle posée en min-width:601px
+       ci-dessus) -> en mobile, écart normal de galerie, comme n'importe quelle ligne isolée
+       (retour Lisa, 20e session : le mockup smartphone chevauchant la capture était illisible
+       en petit écran, elle voulait un espace normal entre les deux). */
+    .pm-gallery > .pm-overlap{margin-top:0;}
     .pm-gallery > .pm-narrow{width:80%;}
     .pm-row{flex-direction:column; gap:40px;}
     /* margin-left/right (pas le raccourci margin) : ne pas écraser le margin-top posé par
@@ -1911,13 +1917,13 @@
         alt: 'Oscaro 25 ans — identité visuelle, dossier de presse, chiffres clés et animation commerciale',
         dir: 'assets/projets/oscaro-25-ans/',
         rows: [
-          { imgs:[ ['01.webp',1228,1161], ['02.webp',1228,1161] ], fit:'cover', tight:true },
+          { imgs:[ ['01.webp',1228,1161], ['02.webp',1228,1161] ], fit:'cover' },
           { imgs:[ ['03.webp',1500,1125] ] },
-          { imgs:[ ['04.webp',1500,684] ] },
-          { imgs:[ ['05.webp',1500,684] ] },
-          { imgs:[ ['06.webp',1500,973] ], download:{ file:'dossier-presse-25-ans.pdf', label:'Voir le dossier de presse complet' } },
+          { imgs:[ ['04.webp',1500,684] ], tight:true },
+          { imgs:[ ['05.webp',1500,684] ], tight:true },
+          { imgs:[ ['06.webp',1500,973] ], tight:true, download:{ file:'dossier-presse-25-ans.pdf', label:'Voir le dossier de presse complet', tight:true } },
           { imgs:[ ['07.webp',1500,747] ] },
-          { imgs:[ ['08.webp',1100,670] ], width:48, overlap:true },
+          { imgs:[ ['08.webp',1100,670] ], width:64, overlap:3.2 },
           { imgs:[ ['09.webp',1000,1289] ], width:46 }
         ]
       },
@@ -1938,9 +1944,10 @@
                  (les 2 cases sont alignées, la marge est transparente).
            width (ligne à 1 photo) : réduit + centre l'image (% de la largeur de la galerie) —
                  utile pour un visuel détouré ou un format portrait qui n'a pas besoin du plein cadre.
-           overlap (ligne à 1 photo) : remonte l'image pour qu'elle chevauche légèrement le bas de
-                 la ligne précédente (ex. mockup smartphone détouré posé sur une capture desktop),
-                 sans toucher le flux normal des lignes suivantes. */
+           overlap (ligne à 1 photo, DESKTOP UNIQUEMENT) : remonte l'image pour qu'elle chevauche
+                 le bas de la ligne précédente (ex. mockup smartphone détouré posé sur une capture
+                 desktop) — `true` = intensité par défaut, ou un nombre pour régler l'intensité
+                 (plus grand = chevauchement plus fort). Toujours désactivé en mobile (écart normal). */
         rows: [
           { imgs:[ ['01.webp',1500,844] ] },
           { imgs:[ ['02.webp',1500,844], ['07.webp',1500,844] ], fit:'cover', tight:true },
@@ -2019,7 +2026,7 @@
         if(made.length === 1){
           if(row.tight) made[0].classList.add('pm-tight');
           if(row.loose) made[0].classList.add('pm-loose');
-          if(row.overlap) made[0].classList.add('pm-overlap');
+          if(row.overlap){ made[0].classList.add('pm-overlap'); made[0].style.setProperty('--ov', row.overlap === true ? 1.15 : row.overlap); }
           if(row.width){ made[0].classList.add('pm-narrow'); made[0].style.setProperty('--nw', row.width + '%'); }
           galEl.appendChild(made[0]);
         } else {
@@ -2053,6 +2060,7 @@
         if(row.download){
           var dl = document.createElement('div');
           dl.className = 'pm-dl';
+          if(row.download.tight) dl.classList.add('pm-tight');
           var a = document.createElement('a');
           a.className = 'pm-dl-btn';
           a.href = d.dir + row.download.file;
