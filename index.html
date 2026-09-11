@@ -647,15 +647,19 @@
      une hauteur automatique -> alignées à la même hauteur au pixel près, sans recadrage ni ratio
      commun imposé (ex. capture web large + capture mobile étroite, côte à côte). */
   .pm-row[data-fit="natural"] > img{flex:0 0 auto; width:var(--w, auto); height:auto;}
+  /* certaines lignes "natural" (ex. Disneyland, très hautes une fois entières) sont volontairement
+     réduites (row.width posé par les données) et centrées, pour raccourcir le scroll sans recadrer. */
+  .pm-row[data-fit="natural"]{max-width:var(--rw, none); margin-left:auto; margin-right:auto;}
   @media (prefers-reduced-motion:reduce){ .pm-scrim,.pm-panel{animation:none;} }
   @media (max-width:600px){
     .pm-panel{max-width:none; width:100%; margin:0; min-height:100%; border-radius:0;}
     .pm-topbar{border-radius:0;}
     .pm-body{padding:2px 18px 40px;}
     .pm-gallery{gap:40px;}
-    /* en mobile toutes les photos sont empilees -> ecart uniforme, pas de resserrage */
+    /* en mobile toutes les photos sont empilees -> ecart uniforme, pas de resserrage, pleine largeur */
     .pm-gallery > .pm-tight{margin-top:0;}
     .pm-row{flex-direction:column; gap:40px;}
+    .pm-row[data-fit="natural"]{max-width:none; margin:0;}
     .pm-row > img, .pm-row[data-fit="natural"] > img{width:100%; height:auto; aspect-ratio:auto; flex:none;}
     .pm-gallery img{border-radius:10px;}
   }
@@ -1850,12 +1854,12 @@
           { imgs:[ ['01.webp',1425,850] ] },
           { imgs:[ ['02.webp',696,493], ['03.webp',702,493] ], fit:'cover', tight:true },
           { imgs:[ ['04.webp',1425,824] ], tight:true },
-          { imgs:[ ['05.webp',267,1544], ['06.webp',552,1545] ], fit:'natural' },
-          { imgs:[ ['07.webp',1152,314], ['08.webp',576,314] ], fit:'natural' },
-          { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural' },
-          { imgs:[ ['11.webp',936,253], ['12.webp',467,252] ], fit:'natural' },
-          { imgs:[ ['13.webp',938,253], ['14.webp',467,252] ], fit:'natural' },
-          { imgs:[ ['15.webp',938,253], ['16.webp',467,252] ], fit:'natural' }
+          { imgs:[ ['05.webp',267,1544], ['06.webp',552,1545] ], fit:'natural', width:65 },
+          { imgs:[ ['07.webp',1152,314], ['08.webp',576,314] ], fit:'natural', tight:true },
+          { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural', tight:true },
+          { imgs:[ ['11.webp',936,253], ['12.webp',467,252] ], fit:'natural', tight:true },
+          { imgs:[ ['13.webp',938,253], ['14.webp',467,252] ], fit:'natural', tight:true },
+          { imgs:[ ['15.webp',938,253], ['16.webp',467,252] ], fit:'natural', tight:true }
         ]
       }
     };
@@ -1901,6 +1905,9 @@
             var ars = row.imgs.map(function(x){ return x[1] / x[2]; });
             var sumAr = ars.reduce(function(s, a){ return s + a; }, 0);
             made.forEach(function(im, idx){ im.style.setProperty('--w', (100 * ars[idx] / sumAr).toFixed(3) + '%'); });
+            /* row.width (%) : réduit + centre la ligne (desktop) pour raccourcir une paire très haute
+               une fois entière (ex. Disneyland), sans recadrer ni casser le rapport entre les 2 photos */
+            if(row.width) r.style.setProperty('--rw', row.width + '%');
           } else {
             /* hauteur commune aux 2 cases : ratio imposé (row.ar) sinon moyenne des ratios de la paire */
             var ar = row.ar || row.imgs.reduce(function(s, x){ return s + x[1] / x[2]; }, 0) / row.imgs.length;
