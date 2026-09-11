@@ -448,11 +448,19 @@
     border:1px solid var(--border);
   }
   .card .thumb{
+    position:relative;
     aspect-ratio:16/10; width:100%; overflow:hidden; background:var(--surface-2);
     display:flex; align-items:center; justify-content:center; color:var(--text-muted);
-    /* légère ombre (pas un trait net, écarté par Lisa) pour séparer la vignette du corps de carte
-       quand une vignette à fond blanc (ex. Berner) s'y fond sinon complètement en thème clair. */
-    box-shadow:inset 0 -10px 8px -10px rgba(0,0,0,.12);
+  }
+  /* légère ombre (pas un trait net, écarté par Lisa) pour séparer la vignette du corps de carte
+     quand une vignette à fond blanc (ex. Berner) s'y fond sinon complètement en thème clair.
+     En ::after (superposé, pas en box-shadow inset) : les photos étant opaques et remplissant
+     toute la vignette, un box-shadow inset posé sur .thumb serait entièrement recouvert par la
+     photo (peinte par-dessus) et resterait invisible — testé, c'est ce qui s'est produit. */
+  .card .thumb::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:10px;
+    background:linear-gradient(to top, rgba(0,0,0,.12), rgba(0,0,0,0));
+    pointer-events:none;
   }
   .card .thumb img{width:100%; height:100%; object-fit:cover;}
   /* Cartes projet cliquables (elles ouvrent une fiche projet) : même animation que les Illustrations
