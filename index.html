@@ -631,6 +631,18 @@
     .pm-head{grid-template-columns:1fr; gap:0;}
     .pm-intro{margin-top:24px; max-width:70ch;}
   }
+  /* bouton de téléchargement (ex. PDF complet d'un magazine) — générique, posé via row.download
+     dans les données d'une fiche projet ; s'insère dans le flux de la galerie, juste après la
+     ligne concernée, avec le même écart que les autres éléments (--pm-gallery gap). */
+  .pm-dl{text-align:center;}
+  .pm-dl-btn{
+    display:inline-flex; align-items:center; gap:8px; background:var(--coral); color:#fff;
+    font-size:14px; font-weight:600; text-decoration:none; padding:13px 28px; border-radius:999px;
+    transition:opacity .15s;
+  }
+  .pm-dl-btn:hover, .pm-dl-btn:focus-visible{opacity:.85;}
+  .pm-dl-btn:focus-visible{outline:2px solid var(--coral); outline-offset:3px;}
+  .pm-dl-btn svg{width:16px; height:16px; flex:0 0 auto;}
   /* galerie : lignes de 1 ou 2 photos (desktop) ; toujours une par une en mobile.
      Fond transparent : les visuels détourés reposent sur la couleur du panneau (suit le thème). */
   .pm-gallery{margin-top:clamp(48px,6vw,84px); display:flex; flex-direction:column; gap:clamp(60px,7.5vw,108px);}
@@ -1906,7 +1918,7 @@
         rows: [
           { imgs:[ ['01.webp',1425,850] ] },
           { imgs:[ ['02.webp',696,493], ['03.webp',702,493] ], fit:'cover', tight:true },
-          { imgs:[ ['04.webp',1425,824] ], tight:true },
+          { imgs:[ ['04.webp',1425,824] ], tight:true, download:{ file:'guide-noel-2017.pdf', label:'Télécharger le PDF complet' } },
           { imgs:[ ['05.webp',267,1544], ['06.webp',552,1545] ], fit:'natural', width:65, loose:true, mobileRow:true },
           { imgs:[ ['07.webp',1152,314], ['08.webp',576,314] ], fit:'natural', loose:true },
           { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural', tight:true },
@@ -1974,6 +1986,17 @@
           }
           made.forEach(function(im){ r.appendChild(im); });
           galEl.appendChild(r);
+        }
+        if(row.download){
+          var dl = document.createElement('div');
+          dl.className = 'pm-dl';
+          var a = document.createElement('a');
+          a.className = 'pm-dl-btn';
+          a.href = d.dir + row.download.file;
+          a.download = row.download.file;
+          a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/></svg>' + row.download.label;
+          dl.appendChild(a);
+          galEl.appendChild(dl);
         }
       });
       return true;
