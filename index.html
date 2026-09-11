@@ -681,14 +681,13 @@
      [fichier,largeur,hauteur,{border:true}]) : sans lui, le fond se confond avec le panneau en
      thème clair (photo bien opaque blanche dans les 2 thèmes, vérifié — pas theme-aware par
      nécessité, mais gardé ainsi par prudence via --pm-outline-c, sans risque).
-     Chez Lisa (Chrome desktop + Safari mobile, wifi/4G, VPN coupé, cache exclu), 2 essais en
-     `box-shadow` ont échoué de façon inhabituelle : semi-transparent -> visible seulement à un
-     zoom précis ; opaque -> flash visible à l'ouverture de la fiche puis disparaît aussitôt et ne
-     revient pas au rechargement. Les 2 pointent vers un souci de rendu du `box-shadow` lui-même
-     (calque composité séparément, sensible à l'animation d'ouverture `pm-rise` du panneau) plutôt
-     que vers la couleur/opacité. Remplacé par un vrai `border` CSS : mécanisme de rendu totalement
-     différent (peint avec le contenu, pas en calque à part), `box-sizing:border-box` pour ne pas
-     élargir l'image et casser l'alignement avec sa voisine dans la ligne. */
+     IMPORTANT — un `box-shadow` ne marche pas ici : chez Lisa (Chrome desktop + Safari mobile,
+     wifi/4G, VPN coupé, cache exclu), 2 essais en `box-shadow` ont échoué de façon inhabituelle
+     (semi-transparent -> visible seulement à un zoom précis ; opaque -> flash à l'ouverture de la
+     fiche puis disparaît), probablement lié à l'animation d'ouverture `pm-rise` du panneau
+     (transform+opacity) qui composite le box-shadow sur un calque à part. Un vrai `border` CSS
+     (peint avec le contenu, pas en calque à part) a résolu le problème, confirmé par Lisa. Garder
+     `border`, ne pas revenir à `box-shadow` sur cet élément. */
   .pm-gallery img.pm-outline{box-sizing:border-box; border:2px solid var(--pm-outline-c, #9a9a9a);}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px); --rg:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
