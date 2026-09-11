@@ -689,7 +689,7 @@
      que vers la couleur/opacité. Remplacé par un vrai `border` CSS : mécanisme de rendu totalement
      différent (peint avec le contenu, pas en calque à part), `box-sizing:border-box` pour ne pas
      élargir l'image et casser l'alignement avec sa voisine dans la ligne. */
-  .pm-gallery img.pm-outline{box-sizing:border-box; border:4px solid var(--pm-outline-c, #262626);}
+  .pm-gallery img.pm-outline{box-sizing:border-box; border:2px solid var(--pm-outline-c, #9a9a9a);}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px); --rg:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
   .pm-row > img{flex:1 1 0; width:0; min-width:0; aspect-ratio:var(--pm-ar, auto); height:auto;}
