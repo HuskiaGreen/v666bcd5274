@@ -648,12 +648,15 @@
      dans les données d'une fiche projet ; s'insère dans le flux de la galerie, juste après la
      ligne concernée, avec le même écart que les autres éléments (--pm-gallery gap). */
   .pm-dl{text-align:center;}
+  /* même logique que les capsules .tag (liseré + texte rose) : rempli au survol plutôt qu'au repos
+     (demande Lisa), rectangle à coins légèrement arrondis plutôt qu'en pilule comme les capsules. */
   .pm-dl-btn{
-    display:inline-flex; align-items:center; gap:8px; background:var(--coral); color:#fff;
-    font-size:14px; font-weight:600; text-decoration:none; padding:13px 28px; border-radius:999px;
-    transition:opacity .15s;
+    display:inline-flex; align-items:center; gap:8px; box-sizing:border-box;
+    background:transparent; color:var(--coral); border:1px solid var(--coral);
+    font-size:14px; font-weight:600; text-decoration:none; padding:13px 28px; border-radius:10px;
+    transition:background-color .15s, color .15s;
   }
-  .pm-dl-btn:hover, .pm-dl-btn:focus-visible{opacity:.85;}
+  .pm-dl-btn:hover, .pm-dl-btn:focus-visible{background:var(--coral); color:#fff;}
   .pm-dl-btn:focus-visible{outline:2px solid var(--coral); outline-offset:3px;}
   .pm-dl-btn svg{width:16px; height:16px; flex:0 0 auto;}
   /* galerie : lignes de 1 ou 2 photos (desktop) ; toujours une par une en mobile.
