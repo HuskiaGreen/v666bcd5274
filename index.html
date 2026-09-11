@@ -696,6 +696,14 @@
     .pm-row.pm-mobile-row{flex-direction:row; gap:clamp(10px,3vw,20px); --rg:clamp(10px,3vw,20px); max-width:none; margin-left:0; margin-right:0;}
     .pm-row > img{width:100%; height:auto; aspect-ratio:auto; flex:none;}
     .pm-row.pm-mobile-row > img{width:calc((100% - var(--rg)) * var(--wf, 1)); height:auto; flex:0 0 auto;}
+    /* les 2 formats d'un même bandeau (grand + carré du même artiste, ligne "natural" empilée en
+       mobile) doivent rester groupés visuellement -> écart interne réduit, DIFFÉRENT de l'écart
+       entre deux bandeaux d'artistes distincts (qui doit rester le gap normal de la galerie, 40px).
+       :not(.pm-mobile-row) cible ces paires empilées sans toucher Disneyland (resté côte-à-côte).
+       Retour Lisa (19e session) : c'était l'inverse avant ce fix (gros écart interne, petit écart
+       entre bandeaux, via row.tightMobile ci-dessus) -> pas logique, corrigé en échangeant les 2
+       valeurs déjà utilisées (20px / 40px) plutôt qu'en inventer de nouvelles. */
+    .pm-row[data-fit="natural"]:not(.pm-mobile-row){gap:20px;}
     /* bandeaux (fit="natural" mais SANS mobileRow) s'empilent comme les autres paires en mobile ->
        chaque image doit reprendre 100% de la largeur, pas sa fraction --wf (pensée pour un vrai
        côte-à-côte desktop). Bug trouvé (18e session) : la règle desktop `.pm-row[data-fit="natural"]
@@ -1901,10 +1909,10 @@
           { imgs:[ ['04.webp',1425,824] ], tight:true },
           { imgs:[ ['05.webp',267,1544], ['06.webp',552,1545] ], fit:'natural', width:65, loose:true, mobileRow:true },
           { imgs:[ ['07.webp',1152,314], ['08.webp',576,314] ], fit:'natural', loose:true },
-          { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural', tight:true, tightMobile:true },
-          { imgs:[ ['11.webp',936,253], ['12.webp',467,252] ], fit:'natural', tight:true, tightMobile:true },
-          { imgs:[ ['13.webp',938,253], ['14.webp',467,252] ], fit:'natural', tight:true, tightMobile:true },
-          { imgs:[ ['15.webp',938,253], ['16.webp',467,252] ], fit:'natural', tight:true, tightMobile:true }
+          { imgs:[ ['09.webp',936,253], ['10.webp',466,252] ], fit:'natural', tight:true },
+          { imgs:[ ['11.webp',936,253], ['12.webp',467,252] ], fit:'natural', tight:true },
+          { imgs:[ ['13.webp',938,253], ['14.webp',467,252] ], fit:'natural', tight:true },
+          { imgs:[ ['15.webp',938,253], ['16.webp',467,252] ], fit:'natural', tight:true }
         ]
       }
     };
