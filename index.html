@@ -954,13 +954,18 @@
        calé sur le reste du site — 20px paraissait trop rond sur de petites cartes */
     #projets .card{border-radius:14px;}
     #projets .card .thumb{aspect-ratio:1/1;}
+    /* même logique que le bouton PDF des fiches projet (liseré + texte rose au repos, rempli au
+       survol/appui) : pas de vrai survol au doigt sur mobile, donc le remplissage se fait aussi
+       au clic (:active), qui joue ce rôle-là ici. */
     .see-more{
       display:block; margin:26px auto 0; padding:12px 30px;
       font-family:inherit; font-weight:700; font-size:15px;
-      color:var(--coral); background:var(--surface);
-      border:1.5px solid var(--coral); border-radius:999px; cursor:pointer;
+      color:var(--coral); background:transparent;
+      border:1px solid var(--coral); border-radius:10px; cursor:pointer;
+      transition:background-color .15s, color .15s;
     }
-    .see-more:active{transform:translateY(1px);}
+    .see-more:hover, .see-more:focus-visible{background:var(--coral); color:#fff;}
+    .see-more:active{background:var(--coral); color:#fff; transform:translateY(1px);}
     /* rangée d'outils : 3 par ligne, badges plus gros (comblent le vide) */
     .tools-row{flex-wrap:wrap; gap:18px 16px; max-width:298px; margin:0 auto;}
     .tool-badge{width:88px; border-radius:20px; font-size:34px;}
