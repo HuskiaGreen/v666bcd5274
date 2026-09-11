@@ -679,16 +679,17 @@
   .pm-gallery img{width:100%; height:auto; display:block; border-radius:14px; background:transparent;}
   /* contour très léger, réservé aux visuels à fond blanc/clair (posé par photo via un 4e élément
      [fichier,largeur,hauteur,{border:true}]) : sans lui, le fond se confond avec le panneau en
-     thème clair. Ces photos ont en réalité un fond TRANSPARENT (pas blanc) : c'est le panneau qui
-     se voit à travers -> le contour doit donc bien être theme-aware (--pm-outline-c), contrairement
-     à ce qui avait été supposé lors des passes précédentes (couleur fixe sombre = invisible en
-     thème sombre, où le panneau derrière la transparence est lui-même sombre).
-     Couleur PLEINE (opaque, sans transparence) plutôt qu'un box-shadow semi-transparent : chez Lisa
-     (Chrome desktop + Safari mobile, wifi/4G, cache pourtant exclu) le contour semi-transparent
-     n'était visible qu'à un zoom précis et disparaissait en zoomant plus OU moins — signe d'un
-     rendu de transparence qui échoue à s'aligner sur les pixels selon le niveau de zoom. Un
-     border plein évite ce risque : même un pixel partiellement couvert reste franchement visible. */
-  .pm-gallery img.pm-outline{box-shadow:inset 0 0 0 4px var(--pm-outline-c, #262626);}
+     thème clair (photo bien opaque blanche dans les 2 thèmes, vérifié — pas theme-aware par
+     nécessité, mais gardé ainsi par prudence via --pm-outline-c, sans risque).
+     Chez Lisa (Chrome desktop + Safari mobile, wifi/4G, VPN coupé, cache exclu), 2 essais en
+     `box-shadow` ont échoué de façon inhabituelle : semi-transparent -> visible seulement à un
+     zoom précis ; opaque -> flash visible à l'ouverture de la fiche puis disparaît aussitôt et ne
+     revient pas au rechargement. Les 2 pointent vers un souci de rendu du `box-shadow` lui-même
+     (calque composité séparément, sensible à l'animation d'ouverture `pm-rise` du panneau) plutôt
+     que vers la couleur/opacité. Remplacé par un vrai `border` CSS : mécanisme de rendu totalement
+     différent (peint avec le contenu, pas en calque à part), `box-sizing:border-box` pour ne pas
+     élargir l'image et casser l'alignement avec sa voisine dans la ligne. */
+  .pm-gallery img.pm-outline{box-sizing:border-box; border:4px solid var(--pm-outline-c, #262626);}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px); --rg:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
   .pm-row > img{flex:1 1 0; width:0; min-width:0; aspect-ratio:var(--pm-ar, auto); height:auto;}
