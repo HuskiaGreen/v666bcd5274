@@ -688,7 +688,7 @@
      (transform+opacity) qui composite le box-shadow sur un calque à part. Un vrai `border` CSS
      (peint avec le contenu, pas en calque à part) a résolu le problème, confirmé par Lisa. Garder
      `border`, ne pas revenir à `box-shadow` sur cet élément. */
-  .pm-gallery img.pm-outline{box-sizing:border-box; border:2px solid var(--pm-outline-c, #9a9a9a);}
+  .pm-gallery img.pm-outline{box-sizing:border-box; border:1px solid var(--pm-outline-c, #c2c2c2);}
   .pm-row{display:flex; align-items:flex-start; gap:clamp(24px,2.8vw,40px); --rg:clamp(24px,2.8vw,40px);}
   /* les 2 photos d'une ligne partagent la même hauteur (--pm-ar posé par le JS) -> bords alignés */
   .pm-row > img{flex:1 1 0; width:0; min-width:0; aspect-ratio:var(--pm-ar, auto); height:auto;}
