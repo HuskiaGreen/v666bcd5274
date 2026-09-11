@@ -673,7 +673,8 @@
      (ex. avant/après la ligne Disneyland, encadrée par le magazine puis les bandeaux). */
   .pm-gallery > .pm-loose{margin-top:calc(clamp(60px,7.5vw,108px) * 1.6);}
   /* row.width sur une ligne à 1 photo (ex. visuel détouré, format portrait) : réduit + centre,
-     au lieu du plein cadre par défaut. */
+     au lieu du plein cadre par défaut. Nombre -> pourcentage direct ; chaîne -> valeur CSS brute
+     (ex. calc(...) pour égaler exactement la largeur d'une image de la paire du dessus, cf. Berner). */
   .pm-gallery > .pm-narrow{width:var(--nw,60%); margin-left:auto; margin-right:auto;}
   /* row.overlap : remonte l'image assez pour chevaucher le bas de la ligne précédente (ex. mockup
      smartphone détouré posé sur une capture desktop). Plus fort que .pm-tight (qui ne fait que
@@ -2012,9 +2013,9 @@
         dir: 'assets/projets/berner/',
         rows: [
           { imgs:[ ['01.webp',454,783], ['02.webp',454,783] ], fit:'cover' },
-          { imgs:[ ['03.webp',454,783] ], width:45 },
+          { imgs:[ ['03.webp',454,783] ], width:'calc((100% - clamp(24px,2.8vw,40px)) / 2)' },
           { imgs:[ ['05.webp',705,431], ['06.webp',705,431] ], fit:'cover' },
-          { imgs:[ ['04.webp',1425,640] ] }
+          { imgs:[ ['04.webp',1425,640] ], tight:true }
         ]
       },
       'oscaro-mdd': {
@@ -2134,7 +2135,7 @@
           if(row.tight) made[0].classList.add('pm-tight');
           if(row.loose) made[0].classList.add('pm-loose');
           if(row.overlap){ made[0].classList.add('pm-overlap'); made[0].style.setProperty('--ov', row.overlap === true ? 1.15 : row.overlap); }
-          if(row.width){ made[0].classList.add('pm-narrow'); made[0].style.setProperty('--nw', row.width + '%'); }
+          if(row.width){ made[0].classList.add('pm-narrow'); made[0].style.setProperty('--nw', typeof row.width === 'number' ? row.width + '%' : row.width); }
           galEl.appendChild(made[0]);
         } else {
           var r = document.createElement('div');
