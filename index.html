@@ -1054,6 +1054,40 @@
     .about-card{padding:56px 24px 50px;}
     .about-body{margin-top:10px; padding:0 6px;}
   }
+
+  /* ---------- Bandeau cookies (consentement mesure d'audience) ----------
+     Microsoft Clarity (statistiques + zones de chaleur) n'est chargé qu'après
+     acceptation explicite ; le choix est mémorisé en localStorage. Bouton
+     "Accepter" en capsule pleine (même famille visuelle que .pm-dl-btn/.see-more,
+     mais inversée : remplie au repos ici pour rester le choix mis en avant). */
+  .cookie-banner{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap:14px 28px; padding:18px clamp(20px,4vw,40px);
+    background:var(--surface); border-top:1px solid var(--border);
+    box-shadow:0 -8px 24px rgba(0,0,0,.1);
+  }
+  .cookie-banner p{margin:0; font-size:14px; line-height:1.5; color:var(--text); max-width:620px;}
+  .cookie-actions{display:flex; gap:12px; flex-wrap:wrap; flex:0 0 auto;}
+  .cookie-btn{
+    display:inline-flex; align-items:center; box-sizing:border-box;
+    font:inherit; font-size:14px; font-weight:600; cursor:pointer;
+    padding:11px 24px; border-radius:10px; border:1px solid var(--coral);
+    background:transparent; color:var(--coral); transition:background-color .15s, color .15s;
+  }
+  .cookie-btn:focus-visible{outline:2px solid var(--coral); outline-offset:3px;}
+  .cookie-btn.is-accept{background:var(--coral); color:#fff;}
+  .cookie-btn.is-accept:active{background:transparent; color:var(--coral);}
+  @media (hover:hover){ .cookie-btn.is-accept:hover{background:transparent; color:var(--coral);} }
+  .cookie-btn.is-decline{color:var(--text-muted); border-color:var(--border);}
+  .cookie-btn.is-decline:active{background:var(--border);}
+  @media (hover:hover){ .cookie-btn.is-decline:hover{color:var(--coral); border-color:var(--coral);} }
+  /* petit lien discret dans le footer pour revenir sur son choix */
+  .cookie-manage{
+    display:inline-block; margin-top:14px; background:none; border:0; padding:0;
+    font-size:12px; color:var(--text-muted); text-decoration:underline; cursor:pointer;
+  }
+  @media (hover:hover){ .cookie-manage:hover{color:var(--coral);} }
 </style>
 </head>
 <body>
@@ -1322,7 +1356,16 @@
   </button>
   <p class="logo"><span class="accent" style="color:var(--coral)">Lisa</span> Levert</p>
   <p class="tag-line">Directrice artistique · print · web · motion · illustration · IA</p>
+  <button class="cookie-manage" id="cookieManage" type="button">Gérer les cookies</button>
 </footer>
+
+<div class="cookie-banner" id="cookieBanner" hidden role="dialog" aria-label="Consentement cookies">
+  <p>Ce site utilise Microsoft Clarity pour savoir combien de personnes le visitent et comment elles s'en servent (pages vues, clics, zones de chaleur). Aucune donnée n'est revendue. Tu peux changer d'avis à tout moment depuis le pied de page.</p>
+  <div class="cookie-actions">
+    <button class="cookie-btn is-decline" id="cookieDecline" type="button">Refuser</button>
+    <button class="cookie-btn is-accept" id="cookieAccept" type="button">Accepter</button>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -2250,6 +2293,61 @@
       if(!modal.hidden && e.key === 'Escape') close();
     });
   })();
+})();
+
+/* ---------- Cookies : consentement Microsoft Clarity (statistiques + zones de chaleur) ----------
+   Choix mémorisé dans localStorage('cookie-consent') = 'accepted' | 'declined'.
+   Le script Clarity n'est chargé qu'après un clic sur "Accepter" (ou automatiquement
+   au chargement si Lisa/le visiteur avait déjà accepté lors d'une visite précédente). */
+(function(){
+  // ⚠️ à remplir une fois le compte Clarity créé (clarity.microsoft.com -> Configuration ->
+  // Installer manuellement -> copier l'identifiant de projet, ex. "abcd1234ef").
+  var CLARITY_ID = '';
+
+  var KEY = 'cookie-consent';
+  var banner = document.getElementById('cookieBanner');
+  var accept = document.getElementById('cookieAccept');
+  var decline = document.getElementById('cookieDecline');
+  var manage = document.getElementById('cookieManage');
+  if(!banner || !accept || !decline) return;
+
+  function loadClarity(){
+    if(!CLARITY_ID || window.clarity) return;
+    (function(c,l,a,r,i){
+      c[a] = c[a] || function(){ (c[a].q = c[a].q || []).push(arguments); };
+      var t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+      var y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', CLARITY_ID);
+  }
+
+  // Clarity pose ses propres cookies (_clck/_clsk) : best-effort pour les effacer si
+  // Lisa/le visiteur revient sur son choix après avoir accepté (pas d'API de retrait côté Clarity).
+  function clearClarityCookies(){
+    ['_clck', '_clsk'].forEach(function(name){
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+    });
+  }
+
+  function show(){ banner.hidden = false; }
+  function hide(){ banner.hidden = true; }
+
+  var choice = null;
+  try{ choice = localStorage.getItem(KEY); }catch(e){}
+
+  if(choice === 'accepted'){ loadClarity(); }
+  else if(choice !== 'declined'){ show(); }
+
+  accept.addEventListener('click', function(){
+    try{ localStorage.setItem(KEY, 'accepted'); }catch(e){}
+    loadClarity();
+    hide();
+  });
+  decline.addEventListener('click', function(){
+    try{ localStorage.setItem(KEY, 'declined'); }catch(e){}
+    clearClarityCookies();
+    hide();
+  });
+  if(manage){ manage.addEventListener('click', show); }
 })();
 </script>
 
