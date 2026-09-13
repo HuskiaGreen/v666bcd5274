@@ -1065,13 +1065,17 @@
      acceptation explicite ; le choix est mémorisé en localStorage. Bouton
      "Accepter" en capsule pleine (même famille visuelle que .pm-dl-btn/.see-more,
      mais inversée : remplie au repos ici pour rester le choix mis en avant). */
+  /* display:none par défaut + .is-open -> flex (même pattern que .lightbox/.project-modal
+     plus haut) : un display permanent sur .cookie-banner primerait sur l'attribut [hidden]
+     posé par le HTML/JS (l'élément resterait visible malgré hidden). */
   .cookie-banner{
     position:fixed; left:0; right:0; bottom:0; z-index:60;
-    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    display:none; flex-wrap:wrap; align-items:center; justify-content:center;
     gap:8px 20px; padding:12px clamp(20px,4vw,40px);
     background:var(--surface); border-top:1px solid var(--border);
     box-shadow:0 -8px 24px rgba(0,0,0,.1);
   }
+  .cookie-banner.is-open{display:flex;}
   .cookie-banner p{margin:0; font-size:13px; line-height:1.4; color:var(--text-muted); max-width:520px;}
   .cookie-actions{display:flex; gap:10px; flex-wrap:wrap; flex:0 0 auto;}
   .cookie-btn{
@@ -2331,8 +2335,8 @@
     });
   }
 
-  function show(){ banner.hidden = false; }
-  function hide(){ banner.hidden = true; }
+  function show(){ banner.hidden = false; banner.classList.add('is-open'); }
+  function hide(){ banner.classList.remove('is-open'); banner.hidden = true; }
 
   var choice = null;
   try{ choice = localStorage.getItem(KEY); }catch(e){}
