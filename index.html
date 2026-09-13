@@ -1035,13 +1035,13 @@
       #illustrations .grid3{scroll-behavior:auto;}
     }
 
-    /* Contact : les 4 boutons alignés sur une seule ligne (évite le retour 3 + 1) */
+    /* Contact : les 3 boutons (Behance retiré) alignés sur une seule ligne, plus espacés */
     /* espace au-dessus de Contact réduit (retour Lisa : trop grand après le
        carrousel d'illustrations) — on garde la symétrie haut/bas */
     #illustrations{padding-bottom:26px;}
     #contact{padding-top:60px; padding-bottom:64px;}
     #contact .section-head{margin-bottom:56px;}    /* + d'air entre le titre et les boutons */
-    #contact .contact-row{gap:12px; flex-wrap:nowrap;}
+    #contact .contact-row{gap:clamp(18px,6vw,32px); flex-wrap:nowrap;}
     #contact .social-btn{width:60px; height:60px;}
     #contact .contact-left{display:none;}          /* petit trait rouge orphelin : masqué en mobile */
   }
