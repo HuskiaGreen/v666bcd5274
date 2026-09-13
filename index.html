@@ -672,8 +672,11 @@
     font-size:14px; font-weight:600; text-decoration:none; padding:13px 28px; border-radius:10px;
     transition:background-color .15s, color .15s;
   }
-  .pm-dl-btn:hover, .pm-dl-btn:focus-visible{background:var(--coral); color:#fff;}
-  .pm-dl-btn:focus-visible{outline:2px solid var(--coral); outline-offset:3px;}
+  .pm-dl-btn:focus-visible{background:var(--coral); color:#fff; outline:2px solid var(--coral); outline-offset:3px;}
+  .pm-dl-btn:active{background:var(--coral); color:#fff;}
+  /* :hover réservé aux appareils avec un vrai pointeur — même correction que .see-more
+     (survol simulé au tap qui restait collé en rose sur mobile). */
+  @media (hover:hover){ .pm-dl-btn:hover{background:var(--coral); color:#fff;} }
   .pm-dl-btn svg{width:16px; height:16px; flex:0 0 auto;}
   /* galerie : lignes de 1 ou 2 photos (desktop) ; toujours une par une en mobile.
      Fond transparent : les visuels détourés reposent sur la couleur du panneau (suit le thème). */
@@ -986,8 +989,12 @@
       border:1px solid var(--coral); border-radius:10px; cursor:pointer;
       transition:background-color .15s, color .15s;
     }
-    .see-more:hover, .see-more:focus-visible{background:var(--coral); color:#fff;}
+    .see-more:focus-visible{background:var(--coral); color:#fff;}
     .see-more:active{background:var(--coral); color:#fff; transform:translateY(1px);}
+    /* :hover réservé aux appareils avec un vrai pointeur (souris) : au doigt, le
+       survol simulé par le navigateur restait « collé » en rose après le tap
+       (pas d'event pour le retirer) — bug remonté par Lisa, corrigé ainsi. */
+    @media (hover:hover){ .see-more:hover{background:var(--coral); color:#fff;} }
     /* rangée d'outils : 3 par ligne, badges plus gros (comblent le vide) */
     .tools-row{flex-wrap:wrap; gap:18px 16px; max-width:298px; margin:0 auto;}
     .tool-badge{width:88px; border-radius:20px; font-size:34px;}
