@@ -925,13 +925,27 @@
       border-radius:22px 22px 0 0;
       box-shadow:0 -14px 34px -18px rgba(0,0,0,.3);
       padding:20px 0 10px;
-      max-height:0; overflow:hidden;
-      /* visibility:hidden en renfort de max-height:0 : certains WebKit mobiles ne clippent
+      /* max-height animé en JS (voir script en fin de fichier) plutôt qu'en CSS pur :
+         la cible fixe min(62vh,400px) était presque toujours plus grande que le contenu
+         réel (5 liens courts) — animer *vers* cette cible surdimensionnée laissait le
+         panneau visuellement figé pendant la 1ère partie de la transition (tant que la
+         valeur animée restait au-dessus de la hauteur réelle du contenu, elle n'avait
+         aucun effet visible), d'où le blocage observé avant la fermeture. Le script
+         calcule la vraie hauteur du contenu (plafonnée à 62vh/400px) et anime max-height
+         jusqu'à cette valeur exacte : plus de palier mort, la fermeture/ouverture est
+         fluide sur toute la durée.
+         visibility:hidden en renfort de max-height:0 : certains WebKit mobiles ne clippent
          pas toujours correctement un conteneur flex à max-height:0 (un bout de contenu
          restait visible en permanence sur iPhone, alors que Chrome desktop clippait bien) —
          la visibilité masque le contenu de façon garantie, indépendamment de ce calcul.
+         overflow:hidden (pas overflow-y:auto) tant que fermé : un conteneur flex scrollable
+         refuse de descendre sous sa propre boîte de padding (ici ~31px) même à max-height:0,
+         ce qui, combiné au délai de fermeture, faisait clairement voir le panneau « caler »
+         sur ce palier avant de disparaître. overflow-y:auto n'est remis qu'à l'ouverture,
+         pour permettre le scroll interne si jamais le contenu dépasse le plafond.
          Délai .34s à la fermeture pour laisser l'animation de repli se voir avant de masquer ;
          aucun délai à l'ouverture pour que le contenu soit là dès que la hauteur grandit. */
+      max-height:0; overflow:hidden;
       visibility:hidden;
       transition:max-height .34s cubic-bezier(.33,1,.68,1), visibility 0s .34s;
     }
@@ -941,7 +955,7 @@
       width:38px; height:4px; border-radius:2px; background:var(--text-muted); opacity:.4;
     }
     .site-header.nav-open nav.main-nav{
-      max-height:min(62vh,400px); overflow-y:auto; visibility:visible;
+      overflow-y:auto; visibility:visible;
       transition:max-height .34s cubic-bezier(.33,1,.68,1), visibility 0s;
     }
     nav.main-nav a{
@@ -1558,11 +1572,20 @@
   var header = document.querySelector('.site-header');
   var mainNav = document.querySelector('nav.main-nav');
   if(navToggle && header && mainNav){
+    // hauteur cible = contenu réel du menu, plafonné à 62vh/400px (mêmes valeurs que
+    // l'ancien CSS min(62vh,400px)) — anime max-height vers cette valeur exacte plutôt
+    // qu'un plafond fixe presque toujours plus grand que le contenu (voir commentaire
+    // CSS sur nav.main-nav : sinon la transition restait visuellement figée tant que la
+    // valeur animée dépassait la hauteur réelle du contenu).
+    var navOpenHeight = function(){
+      return Math.min(mainNav.scrollHeight, window.innerHeight * 0.62, 400);
+    };
     var setNav = function(open){
       header.classList.toggle('nav-open', open);
       document.body.classList.toggle('nav-lock', open);
       navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       navToggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+      mainNav.style.maxHeight = open ? navOpenHeight() + 'px' : '0px';
     };
     navToggle.addEventListener('click', function(){
       setNav(!header.classList.contains('nav-open'));
