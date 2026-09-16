@@ -403,6 +403,8 @@
   :root[data-theme="dark"] .tool-badge[data-app="ps"], :root:not([data-theme="light"]) .tool-badge[data-app="ps"]{color:#4aa8e6;}
   .tool-badge.icon-only .ic{width:100%; height:100%; display:block;}
   .ic-mj{color:var(--text);}
+  /* nom de l'outil au clic (mobile uniquement, voir @media(max-width:700px) plus bas) */
+  .tools-tap-label{display:none;}
 
   /* survol (desktop, pas de clic) : halo corail + petit mouvement
      + nom de l'appli en grand script, sur le côté, relié au badge par une flèche gribouillée */
@@ -866,13 +868,19 @@
       padding:11px 18px calc(11px + env(safe-area-inset-bottom));
       background:var(--header-bg); backdrop-filter:blur(10px);
     }
-    .nav-row .logo{margin-right:auto;}
+    /* logo + boutons : position+z-index explicites pour rester devant nav.main-nav (z-index:2)
+       pendant l'animation d'ouverture — sans ça, un enfant positionné avec z-index (main-nav)
+       passe automatiquement devant ses frères en z-index:auto (logo/boutons), peu importe l'ordre
+       dans le DOM ou le z-index:3 de .nav-row : le panneau balayait le bandeau au moment d'ouvrir. */
+    .nav-row .logo{margin-right:auto; position:relative; z-index:4;}
     .nav-toggle{
       display:flex; align-items:center; justify-content:center;
       width:38px; height:38px; border-radius:50%;
       border:1px solid var(--border); background:var(--surface);
       color:var(--coral); cursor:pointer; flex:0 0 auto;
+      position:relative; z-index:4;
     }
+    .theme-toggle{position:relative; z-index:4;}
     .nav-toggle:focus-visible{outline:2px solid var(--coral); outline-offset:2px;}
     .nav-toggle svg{width:20px; height:20px;}
     .nav-toggle .x{display:none;}
@@ -1011,8 +1019,23 @@
     @media (hover:hover){ .see-more:hover{background:var(--coral); color:#fff;} }
     /* rangée d'outils : 3 par ligne, badges plus gros (comblent le vide) */
     .tools-row{flex-wrap:wrap; gap:18px 16px; max-width:298px; margin:0 auto;}
-    .tool-badge{width:88px; border-radius:20px; font-size:34px;}
+    .tool-badge{width:88px; border-radius:20px; font-size:34px; cursor:pointer;}
     .tools-stars{display:none;}
+    /* au clic (pas de survol possible au doigt) : même halo que le survol desktop,
+       + le nom de l'outil s'écrit en dessous de toute la rangée (pas à côté du badge,
+       pas de place dans une grille 3 colonnes) */
+    .tool-badge.is-active{
+      transform:translateY(-4px); z-index:3;
+      box-shadow:0 0 0 2px rgba(237,110,116,.6), 0 14px 30px -14px rgba(237,110,116,.45), var(--shadow);
+    }
+    .tools-tap-label{
+      display:block; margin-top:22px; text-align:center; min-height:1px;
+      font-family:"Belgium Catherine","Caveat","Segoe Script",cursive;
+      font-weight:400; font-size:clamp(32px,9vw,42px); line-height:1;
+      color:var(--coral); opacity:0; transform:translateY(-6px);
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    .tools-tap-label.is-visible{opacity:1; transform:translateY(0);}
 
     .illus-title .illus-flourish{left:auto; right:-38px; bottom:-32px; width:92px;}
     /* gribouillis Projets : + gros, coupés par les cartes (comme desktop) */
@@ -1239,8 +1262,9 @@
           <div class="tool-badge icon-only" title="Procreate" role="img" aria-label="Procreate"><svg class="ic" viewBox="1059.11 1972.87 143.56 143.56" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pc-g11" x1="1131.09" y1="2111.16" x2="1129.01" y2="2142.15" gradientTransform="translate(0 -56)" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#fd5200"/> <stop offset=".27" stop-color="#ffdc38"/> <stop offset=".96" stop-color="#f3feab"/> </linearGradient><linearGradient id="pc-g7" x1="1177.07" y1="2065.58" x2="1089.76" y2="2133.82" gradientTransform="translate(0 -56)" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#7c4adf"/> <stop offset=".35" stop-color="#e251d8"/> <stop offset=".73" stop-color="#fcdfbc"/> <stop offset=".83" stop-color="#f6f8b0"/> <stop offset=".92" stop-color="#fffff2"/> <stop offset=".99" stop-color="#f6f8b0"/> </linearGradient><linearGradient id="pc-g4" x1="1151.11" y1="2084.16" x2="1092.41" y2="2126.47" gradientTransform="translate(0 -56)" gradientUnits="userSpaceOnUse"> <stop offset=".08" stop-color="#0c64cc"/> <stop offset=".33" stop-color="#1f9fe3"/> <stop offset=".49" stop-color="#1b9deb"/> <stop offset=".76" stop-color="#72f07f"/> <stop offset=".86" stop-color="#dbfec8"/> <stop offset=".99" stop-color="#f6f9b1"/> </linearGradient><linearGradient id="pc-g3" x1="1111.72" y1="2047.81" x2="1090.85" y2="2128.36" gradientTransform="translate(0 -56)" gradientUnits="userSpaceOnUse"> <stop offset=".41" stop-color="#9e010a"/> <stop offset=".62" stop-color="#fc56a4"/> <stop offset=".69" stop-color="#f2a780"/> <stop offset=".74" stop-color="#ffc78a"/> </linearGradient><linearGradient id="pc-g32" x1="1135.31" y1="-934.29" x2="1127.59" y2="-989.81" gradientTransform="translate(0 1082) scale(1 -1)" href="#pc-g3"/><linearGradient id="pc-g6" x1="1119.13" y1="2158.86" x2="1094.1" y2="2143.96" gradientTransform="translate(0 -56)" gradientUnits="userSpaceOnUse"> <stop offset="0" stop-color="#4226a2"/> <stop offset=".32" stop-color="#7357cb"/> <stop offset=".63" stop-color="#3b8fe4"/> </linearGradient><linearGradient id="pc-g10" x1="1149.39" y1="2107.99" x2="1124.12" y2="2092.95" gradientTransform="translate(0 -56)" gradientUnits="userSpaceOnUse"> <stop offset=".03" stop-color="#4226a2"/> <stop offset=".28" stop-color="#7357cb"/> <stop offset=".47" stop-color="#4783df"/> <stop offset=".52" stop-color="#3b8fe4"/> <stop offset=".58" stop-color="#3b9de4"/> <stop offset=".66" stop-color="#3ba7e4"/> <stop offset=".74" stop-color="#3babe4"/> </linearGradient></defs><g> <path fill="url(#pc-g11)" d="M1127.64,2033.21c-14,4.17-38.74,13.71-39.93,52.44,4.47-20.85,15.5-23.84,35.77-28.61,20.27-4.75,31.28-10.12,43.51-24.73,12.22-14.61,8.05-35.46,8.05-35.46,0,11.32-8.05,18.77-15.79,24.14s-17.59,8.05-31.6,12.22Z"/> <g> <path fill="url(#pc-g3)" d="M1087.71,2085.67s0-.01,0,0c.04-1,.09-1.97.15-2.93-.11,1.03-.17,2.01-.15,2.93Z"/> <path fill="url(#pc-g32)" d="M1139.83,2052.27c-10.53,1.98-21.25,1.75-28.28,3.6-12.51,3.27-22.94,18.17-23.84,29.79.04-.99.09-1.96.15-2.93,1.38-12.64,13.04-33.39,38.6-44.75,8.14-3.61,15.46-7.45,21.83-11.37,4.12-1.61,7.72-3.38,10.94-5.61,7.74-5.37,15.79-12.82,15.79-24.14,0,0,.66,17.01-4.85,31.56-.76,1.38-1.62,2.72-2.6,3.98-7.43,9.64-16.19,15.55-27.74,19.86Z"/> </g> <path fill="url(#pc-g4)" d="M1087.88,2082.24c-.07,1.11-.13,2.25-.17,3.42-.07-1.05-.01-2.21.17-3.42,2.5-35.89,26.17-44.98,39.76-49.02,14-4.17,23.84-6.85,31.59-12.22s15.79-12.82,15.79-24.14c0,0,4.18,20.85-8.05,35.46-12.22,14.61-22.35,8.64-42.61,13.4-18.49,4.36-34.5,23.86-36.48,36.51Z"/> <g> <path fill="url(#pc-g10)" d="M1119.29,2047.82c19.08-3.58,30.99-3.28,44.11-17.29,13.11-14,11.62-33.67,11.62-33.67,0,11.32-8.05,18.77-15.79,24.14-3.23,2.24-6.84,4.01-10.94,5.61-6.37,3.92-15.18,7.93-23.32,11.54-25.56,11.36-35.73,31.93-37.11,44.58-.06.96-.11,1.92-.15,2.93.91-11.63,12.52-34.26,31.59-37.84Z"/> <path fill="url(#pc-g6)" d="M1087.71,2085.67s0-.01,0,0c.04-1,.09-1.97.15-2.93-.11,1.03-.17,2.01-.15,2.93Z"/> </g> <path fill="url(#pc-g7)" d="M1132.71,2036.2c-34.87,6.56-45.3,37.35-45,49.46.89-11.62,11.03-25.03,24.14-32.19,19.37-9.84,39.64-4.47,53.64-18.77,14-14.3,9.53-37.85,9.53-37.85,0,11.32-4.18,22.05-11.63,28.32-7.44,6.25-22.34,9.43-30.68,11.03Z"/> </g></svg></div>
           <div class="tool-badge icon-only" title="Nano Banana" role="img" aria-label="Nano Banana"><svg class="ic" viewBox="1222.35 1968 143.56 143.56" xmlns="http://www.w3.org/2000/svg"><path fill="#dcbb21" d="M1326.22,2048.52c-6.3,13.63-19.75,21.78-36.9,22.35-3.01.1-6.06-.16-9.05-.77-1.15-.24-1.9-1.33-1.67-2.45.23-1.12,1.35-1.84,2.5-1.6,2.66.54,5.37.77,8.04.68,15.48-.52,27.59-7.78,33.22-19.94.48-1.04,1.73-1.49,2.8-1.01,1.07.48,1.55,1.71,1.07,2.75M1328.17,2021.2c-2.3-5.33,2.05-11.9-.24-14.76-2.29-2.87-7.16.28-8.66,2.03-1.34,1.55.38,6.33,1.71,10.33.38,1.17.41,2.41,0,3.56-1.01,2.81-2.84,3.36-4.41,8.98-1.64,5.86-3.97,13.29-17.96,20.45-14.24,7.28-30.93,2.05-39-1.39-2.62-1.12-3.98-.72-6.67,3.54-.64,1.02-.78,2.26-.4,3.41,2.96,8.95,18.48,20.1,37.07,19.49,19.97-.66,35.17-10.61,42.2-25.8,7.03-15.2-1.32-24.49-3.62-29.81"/><image href="data:image/webp;base64,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" x="1267.69" y="2003.11" width="34.4" height="34.4"/></svg></div>
           <div class="tool-badge icon-only" title="Midjourney" role="img" aria-label="Midjourney"><svg class="ic ic-mj" viewBox="1385.83 1972.87 143.56 143.56" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M1447.13,2015.06c5.78,5.5,10.47,11.46,13.93,17.72,4.09,7.39,6.47,15.22,7.09,23.3-2.28-.98-7.73-3.08-14.31-3.94-5.03-.66-9.66-.46-13.76.62-3.32.87-6.29,2.31-8.89,4.29,2.67-5.26,4.39-10.96,5.13-17,.78-6.36.49-13.12-.88-20.08-1.61-8.24-4.31-14.72-5.87-18.01,3.42,1.95,10.45,6.34,17.56,13.11M1433.99,2020.38c1.32,6.76,1.61,13.31.85,19.47-.95,7.69-3.54,14.79-7.7,21.11-.24.35-.18.85.12,1.14.14.13.31.19.48.19.2,0,.4-.09.55-.26,3.17-3.79,7.25-6.36,12.12-7.64,3.93-1.03,8.37-1.23,13.23-.6,8.31,1.09,14.99,4.3,15.06,4.34.24.12.51.08.73-.08.21-.17.33-.45.32-.74-.46-8.83-2.95-17.38-7.39-25.41-3.55-6.41-8.34-12.5-14.24-18.11-10.03-9.54-19.97-14.47-20.06-14.52-.3-.14-.66-.06-.87.22-.21.28-.24.68-.07,1,.04.08,4.62,8.34,6.88,19.89"/> <path fill="currentColor" d="M1465.01,2021.59c4.42,3.99,8.28,8.55,11.45,13.53,3.71,5.81,6.51,12.23,8.32,19.09-1.33-.38-3.5-.87-5.92-.87-.95,0-1.95.08-2.95.26-.45-2.23-1.93-8.72-4.93-16.2-2.18-5.42-4.72-10.3-7.57-14.5-1.72-2.54-3.55-4.83-5.48-6.87,2.12,1.44,4.55,3.28,7.07,5.56M1450.6,2011.81c4.25,2.93,8.16,6.99,11.61,12.09,2.78,4.09,5.26,8.85,7.39,14.15,3.64,9.05,5,16.62,5.01,16.7.04.22.15.42.33.54.17.12.37.17.57.12,4.8-1.21,10.07.8,10.12.83.08.03.17.04.25.04.18,0,.37-.08.51-.22.2-.21.29-.53.21-.84-1.85-7.61-4.85-14.72-8.94-21.11-3.27-5.11-7.22-9.77-11.76-13.86-7.72-6.97-14.37-9.82-14.65-9.94-.36-.15-.77.03-.94.41-.17.39-.05.86.28,1.09"/> <path fill="currentColor" d="M1471.61,2073.85c-1.02-.86-2.07-1.75-3.33-2.34-3.18-1.46-6.93-.71-9.34,1.87-1.56,1.67-3.29,2.7-5.12,3.04-2.15.4-4.4-.13-6.17-1.43-.51-.38-.99-.8-1.5-1.25-1.18-1.03-2.41-2.09-3.96-2.59-2.4-.78-5.07-.29-7.32,1.34-.6.43-1.16.91-1.7,1.38-.34.29-.67.57-1,.84l-8.25-9.13,66.98-1.92-16.42,12.23c-1.02-.5-1.91-1.26-2.86-2.05M1503.96,2077.45c-.02-.46-.37-.82-.79-.79-1.54.09-2.94-.28-4.05-1.06-.66-.46-1.26-.99-1.9-1.55-.67-.58-1.36-1.19-2.1-1.71-2.51-1.74-5.42-2.15-7.78-1.12-1.42.62-2.65,1.59-3.84,2.52-.71.56-1.38,1.08-2.09,1.54-1.63,1.06-3.37,1.48-5.03,1.23l17.5-13.05c.28-.21.4-.6.3-.95-.1-.35-.4-.6-.73-.58l-71.34,2.04c-.3.01-.56.22-.67.53-.11.31-.05.67.17.9l9.27,10.25c-.36.23-.74.41-1.13.56-1.98.73-3.9.25-5.16-.28-1.28-.55-2.4-1.42-3.58-2.34-.42-.33-.85-.67-1.29-.99-1.41-1.04-3.55-2.35-5.88-1.84-.4.09-.67.53-.59.99.08.46.47.75.88.66,1.36-.3,2.88.21,4.77,1.59.42.31.85.64,1.26.96,1.2.95,2.45,1.92,3.91,2.54,2.13.9,4.26,1,6.15.29.84-.31,1.58-.77,2.28-1.29h0c.55-.41,1.06-.85,1.57-1.29.55-.47,1.06-.91,1.61-1.31,1.88-1.37,4.1-1.79,6.09-1.14,1.28.42,2.34,1.33,3.46,2.31.51.45,1.04.91,1.6,1.32,2.08,1.54,4.72,2.16,7.24,1.69,2.14-.4,4.13-1.57,5.92-3.49,1.98-2.13,5.1-2.74,7.74-1.53,1.08.5,2.01,1.28,3,2.12,1.04.88,2.12,1.79,3.4,2.36.06.03.12.05.17.08h0c2.52,1.07,5.31.75,7.86-.9.77-.5,1.49-1.07,2.2-1.62,1.17-.91,2.27-1.78,3.53-2.33,1.92-.84,4.33-.47,6.45.99.68.47,1.31,1.02,1.97,1.6.64.56,1.3,1.15,2.02,1.65,1.25.88,2.75,1.33,4.4,1.33.18,0,.35,0,.53-.02.41-.02.73-.42.71-.88"/></svg></div>
-          <div class="tool-badge icon-only" title="Claude" role="img" aria-label="Claude"><svg class="ic ic-claude" viewBox="-27 -27 154 154" xmlns="http://www.w3.org/2000/svg"><g stroke="#d97757" stroke-width="7.5" stroke-linecap="round"><line x1="50.00" y1="44.00" x2="50.00" y2="12.00"/><line x1="53.24" y1="44.95" x2="68.92" y2="20.56"/><line x1="55.46" y1="47.51" x2="84.57" y2="34.21"/><line x1="55.94" y1="50.85" x2="83.65" y2="54.84"/><line x1="54.53" y1="53.93" x2="78.72" y2="74.88"/><line x1="51.69" y1="55.76" x2="59.86" y2="83.58"/><line x1="48.31" y1="55.76" x2="39.58" y2="85.50"/><line x1="45.47" y1="53.93" x2="24.30" y2="72.27"/><line x1="44.06" y1="50.85" x2="12.39" y2="55.41"/><line x1="44.54" y1="47.51" x2="18.16" y2="35.46"/><line x1="46.76" y1="44.95" x2="30.00" y2="18.87"/></g><circle cx="50" cy="50" r="7" fill="#d97757"/></svg></div>
+          <div class="tool-badge icon-only" title="Claude Code" role="img" aria-label="Claude Code"><svg class="ic ic-claude" viewBox="-27 -27 154 154" xmlns="http://www.w3.org/2000/svg"><g stroke="#d97757" stroke-width="7.5" stroke-linecap="round"><line x1="50.00" y1="44.00" x2="50.00" y2="12.00"/><line x1="53.24" y1="44.95" x2="68.92" y2="20.56"/><line x1="55.46" y1="47.51" x2="84.57" y2="34.21"/><line x1="55.94" y1="50.85" x2="83.65" y2="54.84"/><line x1="54.53" y1="53.93" x2="78.72" y2="74.88"/><line x1="51.69" y1="55.76" x2="59.86" y2="83.58"/><line x1="48.31" y1="55.76" x2="39.58" y2="85.50"/><line x1="45.47" y1="53.93" x2="24.30" y2="72.27"/><line x1="44.06" y1="50.85" x2="12.39" y2="55.41"/><line x1="44.54" y1="47.51" x2="18.16" y2="35.46"/><line x1="46.76" y1="44.95" x2="30.00" y2="18.87"/></g><circle cx="50" cy="50" r="7" fill="#d97757"/><!-- repère « code » ajouté pour distinguer Claude Code du simple logo Claude --><circle cx="93" cy="93" r="24" fill="#1c1c1c"/><g stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M87,84 L77,93 L87,102"/><path d="M99,84 L109,93 L99,102"/><path d="M96,86 L90,100"/></g></svg></div>
         </div>
+        <div class="tools-tap-label" aria-live="polite"></div>
       </div>
     </div>
   </section>
@@ -1524,6 +1548,33 @@
       if(e.key === 'Escape' && header.classList.contains('nav-open')){ setNav(false); }
     });
   }
+
+  // Mes outils (mobile) : clic sur un badge -> nom du logiciel affiché sous la rangée
+  // (sur desktop c'est déjà géré par :hover en CSS, ce script ne sert qu'au tactile)
+  (function(){
+    var badges = [].slice.call(document.querySelectorAll('#mes-outils .tool-badge'));
+    var label = document.querySelector('.tools-tap-label');
+    if(!badges.length || !label) return;
+    function clear(){
+      badges.forEach(function(b){ b.classList.remove('is-active'); });
+      label.classList.remove('is-visible');
+    }
+    badges.forEach(function(b){
+      b.addEventListener('click', function(){
+        var wasActive = b.classList.contains('is-active');
+        clear();
+        if(!wasActive){
+          b.classList.add('is-active');
+          label.textContent = b.getAttribute('title') || '';
+          label.classList.add('is-visible');
+        }
+      });
+    });
+    // clic ailleurs sur la page -> referme
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('#mes-outils .tool-badge')){ clear(); }
+    });
+  })();
 
   // Lightbox illustrations : clic sur une des 3 illus -> plein écran, navigation entre les 3
   (function(){
